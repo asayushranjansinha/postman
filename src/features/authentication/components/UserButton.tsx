@@ -1,6 +1,13 @@
 "use client";
+
+import {
+  CreditCardIcon,
+  LogOutIcon,
+  SettingsIcon,
+  UserIcon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ComponentPropsWithoutRef, useTransition } from "react";
+import { ComponentPropsWithoutRef } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -14,26 +21,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
-import {
-  CreditCardIcon,
-  LogOutIcon,
-  SettingsIcon,
-  UserIcon,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
-
-// Types for the user data
-interface UserData {
-  id: string;
-  email: string | null;
-  name: string | null;
-  image: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { UserProps } from "../types";
 
 interface UserButtonProps {
-  user: UserData | null;
+  user: UserProps | null;
   onLogout?: () => void | Promise<void>;
   onSettings?: () => void;
   onProfile?: () => void;
@@ -59,7 +51,6 @@ export const UserButton = ({
   showEmail = true,
   showMemberSince = false,
 }: UserButtonProps) => {
-  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const getInitials = (name: string | null, email: string | null) => {
@@ -78,10 +69,10 @@ export const UserButton = ({
   };
 
   const formatMemberSince = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
+    return new Intl.DateTimeFormat("en-IN", {
       month: "long",
       year: "numeric",
-    }).format(new Date(date));
+    }).format(date);
   };
 
   const onSignOut = async () => {
@@ -99,7 +90,7 @@ export const UserButton = ({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="relative rounded-full">
+      <DropdownMenuTrigger className="relative">
         <Avatar
           aria-label="User Menu"
           className={cn(
@@ -108,15 +99,15 @@ export const UserButton = ({
               : size === "lg"
               ? "h-12 w-12"
               : "h-10 w-10",
-            "rounded-full"
+            "rounded-sm border-2"
           )}
         >
           <AvatarImage
-            className="rounded-full"
+            className="rounded-sm"
             src={user?.image || undefined}
-            alt={user?.name || `${user.email} - "Profile"`}
+            alt={user?.name || `${user.email}'s Profile`}
           />
-          <AvatarFallback className="rounded-full">
+          <AvatarFallback className="rounded-sm">
             {getInitials(user?.name, user?.email)}
           </AvatarFallback>
         </Avatar>
