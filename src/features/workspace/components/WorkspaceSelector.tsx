@@ -34,7 +34,7 @@ export const WorkspaceSelector = () => {
           <span className="text-sm pl-2 font-medium text-muted-foreground">
             My Workspaces
           </span>
-          <Button size="icon-sm" variant="outline">
+          <Button size="icon-sm" variant="outline" aria-label="Add workspace">
             <Plus className="size-4" />
           </Button>
         </div>

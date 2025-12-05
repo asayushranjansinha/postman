@@ -22,8 +22,11 @@ import {
 export const InviteMember = () => {
   const [copied, setIsCopied] = useState(false);
   const generateInviteLink = async () => {};
-  const copyToClipboard = async () => {};
-
+  const copyToClipboard = async () => {
+    // TODO: Implement clipboard copy logic
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
   return (
     <DropdownMenu>
       <Hint label="Invite Member">

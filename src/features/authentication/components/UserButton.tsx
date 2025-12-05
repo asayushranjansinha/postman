@@ -105,7 +105,7 @@ export const UserButton = ({
           <AvatarImage
             className="rounded-sm"
             src={user?.image || undefined}
-            alt={user?.name || `${user.email} - "Profile"`}
+            alt={user?.name || `${user.email}'s Profile`}
           />
           <AvatarFallback className="rounded-sm">
             {getInitials(user?.name, user?.email)}
