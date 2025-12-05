@@ -18,7 +18,7 @@ export const OAuthButtons = () => {
       })
       .then(() => {
         toast.success("Logged in successfully", {
-          description: "Redirecting to dashboard",
+          description: "Redirecting to home",
         });
       })
       .catch((error) => {
@@ -35,7 +35,7 @@ export const OAuthButtons = () => {
         className="w-full"
         onClick={() => signInWithProvider("github")}
       >
-        <Icons.github className="mr-2 h-4 w-4 dark:inver" />
+        <Icons.github className="mr-2 h-4 w-4 dark:invert" />
         Sign in with GitHub
       </Button>
 
