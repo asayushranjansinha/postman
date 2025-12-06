@@ -22,6 +22,14 @@ const CreateWorkspace = ({
   const handleSubmit = (values: CreateWorkspaceFormValues) => {
     createWorkspace.mutate(values.name, {
       onSuccess(data) {
+        // Check for silent failures
+        if (!data?.success || !data.workspace) {
+          toast.error("Failed to create workspace", {
+            description: data?.error ?? "Unknown error occurred",
+          });
+          return;
+        }
+
         toast.success(
           `Workspace "${data.workspace?.name}" created successfully`,
           {

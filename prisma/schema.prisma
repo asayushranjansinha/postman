@@ -105,7 +105,7 @@ model WorkspaceMember {
 
   role Member @default(MEMBER)
 
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId String
 
   userId String
