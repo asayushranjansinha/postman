@@ -5,6 +5,7 @@ import {
   EllipsisVertical,
   FilePlus,
   Folder,
+  Loader2,
   Trash,
 } from "lucide-react";
 import { useState } from "react";
@@ -23,29 +24,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { Collection } from "../types";
-import { DeleteCollectionModal } from "./DeleteCollectionDialog";
+import { DeleteRequestModal } from "@/features/requests/components/DeleteRequestModal";
+import { EditRequestModal } from "@/features/requests/components/EditRequestModal";
+import { SaveRequestToCollectionModal } from "@/features/requests/components/SaveRequestToCollectionModal";
+import { useGetAllRequestsInCollectionQuery } from "@/features/requests/hooks/request";
+
+import { DeleteCollectionModal } from "./DeleteCollectionModal";
 import { EditCollectionModal } from "./EditCollectionModal";
+
+import { Collection } from "../types";
 
 interface Props {
   collection: Collection;
 }
-
-// TODO: Replace with actual requests
-const MOCK_REQUESTS = [
-  {
-    id: "1",
-    method: "GET",
-    name: "Fetch Users",
-    url: "/api/users",
-  },
-  {
-    id: "2",
-    method: "POST",
-    name: "Create User",
-    url: "/api/users",
-  },
-];
 
 const requestColorMap = {
   GET: "text-green-500",
@@ -59,9 +50,51 @@ export const CollectionFolder = ({ collection }: Props) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
 
-  const requestData = MOCK_REQUESTS;
+  // Request modals state
+  const [showEditRequestModal, setShowEditRequestModal] = useState(false);
+  const [showDeleteRequestModal, setShowDeleteRequestModal] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<{
+    id: string;
+    name: string;
+    url: string;
+    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+    collectionId: string;
+  } | null>(null);
+
+  const { data, isPending, isError } = useGetAllRequestsInCollectionQuery(
+    collection.id
+  );
+
+  const requestData = data?.requests || [];
   const hasRequests = requestData.length > 0;
+
+  const handleAddRequest = () => {
+    setShowSaveModal(true);
+  };
+
+  const handleEditRequest = (request: any) => {
+    setSelectedRequest({
+      id: request.id,
+      name: request.name,
+      url: request.url,
+      method: request.method,
+      collectionId: collection.id,
+    });
+    setShowEditRequestModal(true);
+  };
+
+  const handleDeleteRequest = (request: any) => {
+    setSelectedRequest({
+      id: request.id,
+      name: request.name,
+      url: request.url,
+      method: request.method,
+      collectionId: collection.id,
+    });
+    setShowDeleteRequestModal(true);
+  };
 
   return (
     <>
@@ -75,7 +108,9 @@ export const CollectionFolder = ({ collection }: Props) => {
           <div className="flex justify-between items-center hover:bg-accent rounded-md px-2 py-2">
             <CollapsibleTrigger className="flex flex-row items-center gap-2 flex-1 bg-transparent">
               <div className="flex items-center gap-1">
-                {hasRequests ? (
+                {isPending ? (
+                  <Loader2 className="size-4 text-zinc-400 animate-spin" />
+                ) : hasRequests ? (
                   isCollapsed ? (
                     <ChevronDown className="size-4 text-zinc-400" />
                   ) : (
@@ -91,19 +126,24 @@ export const CollectionFolder = ({ collection }: Props) => {
                 {collection.name}
               </span>
 
-              {hasRequests && (
-                <span className="text-xs text-muted-foreground">
-                  ({requestData.length})
-                </span>
+              {isPending ? (
+                <span className="text-xs text-muted-foreground">(...)</span>
+              ) : (
+                hasRequests && (
+                  <span className="text-xs text-muted-foreground">
+                    ({requestData.length})
+                  </span>
+                )
               )}
             </CollapsibleTrigger>
 
             {/* Actions - UI */}
             <div className="flex items-center gap-1">
-              <Hint label="Add New">
+              <Hint label="Add New Request">
                 <Button
                   variant="ghost"
                   className="p-1.5! h-fit w-fit group cursor-pointer"
+                  onClick={handleAddRequest}
                 >
                   <FilePlus className="size-4 group-hover:text-foreground text-muted-foreground" />
                 </Button>
@@ -120,8 +160,7 @@ export const CollectionFolder = ({ collection }: Props) => {
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent className="w-40">
-                  {/* TODO: Add Request Logic */}
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleAddRequest}>
                     <FilePlus className="mr-2 size-4 text-green-400" />
                     Add Request
                   </DropdownMenuItem>
@@ -142,7 +181,16 @@ export const CollectionFolder = ({ collection }: Props) => {
 
           {/* Requests List */}
           <CollapsibleContent>
-            {hasRequests ? (
+            {isPending ? (
+              <div className="ml-6 pl-3 text-xs text-muted-foreground py-2 flex items-center gap-2">
+                <Loader2 className="size-3 animate-spin" />
+                Loading requests...
+              </div>
+            ) : isError ? (
+              <div className="ml-6 pl-3 text-xs text-red-500 py-2">
+                Failed to load requests
+              </div>
+            ) : hasRequests ? (
               <div className="ml-6 border-l pl-3 space-y-1 py-1">
                 {requestData.map((request) => (
                   <div
@@ -175,13 +223,16 @@ export const CollectionFolder = ({ collection }: Props) => {
                         <EllipsisVertical className="size-4 text-muted-foreground" />
                       </DropdownMenuTrigger>
 
-                      {/* TODO: Implement Request Logic */}
-                      <DropdownMenuContent className="w-32">
-                        <DropdownMenuItem>
+                      <DropdownMenuContent className="w-32" align="end">
+                        <DropdownMenuItem
+                          onClick={() => handleEditRequest(request)}
+                        >
                           <Edit className="text-blue-400 mr-2 size-3" />
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDeleteRequest(request)}
+                        >
                           <Trash className="text-red-400 mr-2 size-3" />
                           Delete
                         </DropdownMenuItem>
@@ -193,7 +244,6 @@ export const CollectionFolder = ({ collection }: Props) => {
             ) : (
               <div className="ml-6 pl-3 text-xs text-muted-foreground">
                 No requests yet
-                {/* Design UI */}
               </div>
             )}
           </CollapsibleContent>
@@ -204,6 +254,7 @@ export const CollectionFolder = ({ collection }: Props) => {
         isModalOpen={showDeleteModal}
         setIsModalOpen={setShowDeleteModal}
         collectionId={collection.id}
+        collectionName={collection.name}
       />
 
       <EditCollectionModal
@@ -213,7 +264,32 @@ export const CollectionFolder = ({ collection }: Props) => {
         initialData={collection}
       />
 
-      {/* TODO: Implement Request Modal */}
+      {/* Request modals */}
+      <SaveRequestToCollectionModal
+        workspaceId={collection.workspaceId}
+        isModalOpen={showSaveModal}
+        setIsModalOpen={setShowSaveModal}
+        preSelectedCollectionId={collection.id}
+      />
+
+      {selectedRequest && (
+        <>
+          <EditRequestModal
+            isModalOpen={showEditRequestModal}
+            setIsModalOpen={setShowEditRequestModal}
+            workspaceId={collection.workspaceId}
+            requestId={selectedRequest.id}
+            initialData={selectedRequest}
+          />
+
+          <DeleteRequestModal
+            isModalOpen={showDeleteRequestModal}
+            setIsModalOpen={setShowDeleteRequestModal}
+            requestId={selectedRequest.id}
+            requestName={selectedRequest.name}
+          />
+        </>
+      )}
     </>
   );
 };

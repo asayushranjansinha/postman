@@ -1,3 +1,4 @@
+// app/dashboard/[workspaceId]/page.tsx
 import {
   dehydrate,
   HydrationBoundary,
@@ -9,6 +10,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { getWorkspaceById } from "@/features/workspace/actions";
+import { getCollections } from "@/features/collection/actions"; // ADD THIS
 import { RequestPlayGround } from "@/features/workspace/components/RequestPlayGround";
 import { RequestSidebar } from "@/features/workspace/components/RequestSidebar";
 
@@ -21,39 +23,30 @@ type PageProps = {
 export default async function Page({ params }: PageProps) {
   const { workspaceId } = await params;
 
-  // Prefetch workspace and hydrate it
   const queryClient = new QueryClient();
+
+  // Prefetch workspace details
   await queryClient.prefetchQuery({
     queryKey: ["workspace", workspaceId],
     queryFn: () => getWorkspaceById(workspaceId),
   });
 
+  // Prefetch collections for this workspace
+  await queryClient.prefetchQuery({
+    queryKey: ["collections", workspaceId],
+    queryFn: () => getCollections(workspaceId),
+  });
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <ResizablePanelGroup direction="horizontal">
-        {/* Playground */}
         <ResizablePanel defaultSize={65} minSize={40}>
           <div className="h-full divide-y overflow-y-scroll">
-            {/* TODO: Implement Playground Logic */}
-            <RequestPlayGround />
-
-            <div className="h-72"></div>
-            <div className="h-72"></div>
-            <div className="h-72"></div>
-            <div className="h-72"></div>
-            <div className="h-72"></div>
-            <div className="h-72"></div>
-            <div className="h-72"></div>
-            <div className="h-72"></div>
-            <div className="h-72"></div>
-            <div className="h-72"></div>
-            <div className="h-72"></div>
-            <div className="h-72"></div>
+            <RequestPlayGround workspaceId={workspaceId} />
+            {/* Remove dummy divs, add actual content */}
           </div>
         </ResizablePanel>
-
         <ResizableHandle withHandle />
-
         <ResizablePanel
           defaultSize={35}
           maxSize={40}
@@ -61,7 +54,8 @@ export default async function Page({ params }: PageProps) {
           className="flex"
         >
           <div className="h-full w-full overflow-hidden">
-            <RequestSidebar />
+            {/* Pass workspaceId as prop instead of using store */}
+            <RequestSidebar workspaceId={workspaceId} />
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>

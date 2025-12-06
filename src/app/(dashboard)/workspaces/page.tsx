@@ -1,11 +1,23 @@
-import React from "react";
+// app/workspaces/page.tsx
+import { redirect } from "next/navigation";
+import { getWorkspaces } from "@/features/workspace/actions";
 
-const Page = () => {
+export default async function WorkspacesPage() {
+  const { workspaces } = await getWorkspaces();
+
+  // Redirect to first workspace if available
+  if (workspaces && workspaces.length > 0) {
+    redirect(`/workspaces/${workspaces[0].id}`);
+  }
+
+  // Show create workspace page if no workspaces
   return (
-    <div className="flex-1 flex items-center justify-center">
-      <h1>TODO: Add workspaces page</h1>
+    <div className="flex flex-col items-center justify-center h-full gap-4">
+      <h1 className="text-2xl font-semibold">Welcome to Your Workspace</h1>
+      <p className="text-muted-foreground">
+        Create your first workspace to get started
+      </p>
+      {/* TODO: Add CreateWorkspaceButton component */}
     </div>
   );
-};
-
-export default Page;
+}

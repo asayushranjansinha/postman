@@ -4,11 +4,8 @@ import { useState } from "react";
 
 import { Hint } from "@/components/shared/Hint";
 import { Button } from "@/components/ui/button";
-import { useWorkspaceById } from "../hooks/workspace";
-import { CollectionTabs } from "./(tabs)/CollectionTabs";
-
 import { cn } from "@/lib/utils";
-import { useWorkspaceStore } from "@/store";
+import { CollectionTabs } from "./(tabs)/CollectionTabs";
 
 const sidebarItems = [
   { icon: ArchiveIcon, label: "Collections" },
@@ -17,16 +14,33 @@ const sidebarItems = [
   { icon: CodeIcon, label: "Code" },
 ];
 
-export function RequestSidebar() {
+interface RequestSidebarProps {
+  workspaceId: string;
+}
+
+export function RequestSidebar({ workspaceId }: RequestSidebarProps) {
   const [activeTab, setActiveTab] = useState("Collections");
-  const { selectedWorkspace } = useWorkspaceStore();
-  useWorkspaceById(selectedWorkspace?.id!);
 
   const renderTabContent = () => {
-    // TODO: Implement other tabs logic
     switch (activeTab) {
       case "Collections":
-        return <CollectionTabs currentWorkspace={selectedWorkspace} />;
+        return <CollectionTabs workspaceId={workspaceId} />;
+      case "History":
+        return (
+          <div className="p-4 text-muted-foreground">
+            History coming soon...
+          </div>
+        );
+      case "Share":
+        return (
+          <div className="p-4 text-muted-foreground">Share coming soon...</div>
+        );
+      case "Code":
+        return (
+          <div className="p-4 text-muted-foreground">
+            Code generation coming soon...
+          </div>
+        );
       default:
         return (
           <div className="p-4 text-muted-foreground">

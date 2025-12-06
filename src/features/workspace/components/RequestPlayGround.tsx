@@ -1,7 +1,9 @@
-import React from 'react'
+import React from "react";
 
-export const RequestPlayGround = () => {
-  return (
-   <div className="h-[200vh]">RequestPlayGround</div>
-  )
+interface RequestPlayGroundProps {
+  workspaceId: string;
 }
+
+export const RequestPlayGround = ({ workspaceId }: RequestPlayGroundProps) => {
+  return <div className="h-[200vh]">RequestPlayGround</div>;
+};

@@ -40,13 +40,13 @@ const Modal: React.FC<ModalProps> = ({
     return (
       <Drawer open={isOpen} onOpenChange={onClose}>
         <DrawerContent className={className}>
-          <DrawerHeader>
+          <DrawerHeader className="select-none">
             <DrawerTitle>{title}</DrawerTitle>
             {description && (
               <DrawerDescription>{description}</DrawerDescription>
             )}
           </DrawerHeader>
-         <div className="p-4 flex flex-col">{children}</div>
+          <div className="p-4 flex flex-col">{children}</div>
         </DrawerContent>
       </Drawer>
     );
@@ -54,12 +54,14 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={className}>
-        <DialogHeader>
+      <DialogContent className={`${className} overflow-hidden`}>
+        <DialogHeader className="select-none">
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-        <div className="max-sm:p-4 flex flex-col">{children}</div>
+        <div className="max-sm:p-4 flex flex-col overflow-y-auto">
+          {children}
+        </div>
       </DialogContent>
     </Dialog>
   );

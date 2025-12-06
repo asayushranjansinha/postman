@@ -11,10 +11,12 @@ export const DeleteCollectionModal = ({
   isModalOpen,
   setIsModalOpen,
   collectionId,
+  collectionName,
 }: {
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
   collectionId: string;
+  collectionName: string;
 }) => {
   const deleteCollection = useDeleteCollection();
 
@@ -41,22 +43,31 @@ export const DeleteCollectionModal = ({
       onClose={() => setIsModalOpen(false)}
       className="max-w-sm"
     >
-      <div className="flex justify-end gap-2">
-        <Button
-          variant="ghost"
-          onClick={() => setIsModalOpen(false)}
-          disabled={deleteCollection.isPending}
-        >
-          Cancel
-        </Button>
+      <div className="space-y-4">
+        <p className="text-sm text-muted-foreground">
+          Are you sure you want to delete the collection{" "}
+          <span className="font-semibold text-foreground">
+            "{collectionName}"
+          </span>
+          ?
+        </p>
+        <div className="flex justify-end gap-2 pt-4">
+          <Button
+            variant="ghost"
+            onClick={() => setIsModalOpen(false)}
+            disabled={deleteCollection.isPending}
+          >
+            Cancel
+          </Button>
 
-        <Button
-          variant="destructive"
-          onClick={handleDelete}
-          disabled={deleteCollection.isPending}
-        >
-          {deleteCollection.isPending ? "Deleting..." : "Delete"}
-        </Button>
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={deleteCollection.isPending}
+          >
+            {deleteCollection.isPending ? "Deleting..." : "Delete"}
+          </Button>
+        </div>
       </div>
     </AlertModal>
   );
