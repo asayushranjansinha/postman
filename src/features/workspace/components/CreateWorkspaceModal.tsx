@@ -1,6 +1,7 @@
 // CreateWorkspace.tsx
 "use client";
 import { toast } from "sonner";
+
 import Modal from "@/components/shared/Modal";
 import { useCreateWorkspace } from "../hooks/workspace";
 import {
@@ -8,15 +9,15 @@ import {
   CreateWorkspaceFormValues,
 } from "./CreateWorkspaceForm";
 
-interface CreateWorkspaceProps {
+interface CreateWorkspaceModalProps {
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
 }
 
-const CreateWorkspace = ({
+const CreateWorkspaceModal = ({
   isModalOpen,
   setIsModalOpen,
-}: CreateWorkspaceProps) => {
+}: CreateWorkspaceModalProps) => {
   const createWorkspace = useCreateWorkspace();
 
   const handleSubmit = (values: CreateWorkspaceFormValues) => {
@@ -59,4 +60,4 @@ const CreateWorkspace = ({
   );
 };
 
-export default CreateWorkspace;
+export default CreateWorkspaceModal;

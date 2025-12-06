@@ -92,7 +92,8 @@ model Workspace {
   ownerId String
   owner   User   @relation("UserWorkspaces", fields: [ownerId], references: [id], onDelete: Cascade)
 
-  members WorkspaceMember[]
+  members     WorkspaceMember[]
+  collections Collection[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -105,11 +106,7 @@ model WorkspaceMember {
 
   role Member @default(MEMBER)
 
-<<<<<<< HEAD
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-=======
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
->>>>>>> 9925d9d (feat: Implement workspace core features, server actions, Prisma schema updates, and Tanstack Query integration and downgrade to next 15.5.7 to fix tailwind css issues)
   workspaceId String
 
   userId String
@@ -124,4 +121,22 @@ model WorkspaceMember {
 enum Member {
   ADMIN
   MEMBER
+}
+
+/**
+ * COLLECTIONS
+ */
+model Collection {
+  id String @id @default(cuid())
+
+  name String @unique
+
+  // Relations
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, workspaceId])
 }

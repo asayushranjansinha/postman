@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Plus, User } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -21,6 +22,7 @@ import CreateWorkspaceModal from "./CreateWorkspaceModal";
 export const WorkspaceSelector = () => {
   // State to control create workspace modal
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const router = useRouter();
 
   // Fetch workspaces from API
   const { data } = useWorkspaces();
@@ -47,20 +49,33 @@ export const WorkspaceSelector = () => {
         value={selectedWorkspace?.id}
         onValueChange={(id) => {
           const ws = workspaces?.find((ws) => ws.id === id);
-          if (ws) setSelectedWorkspace(ws);
+          if (ws) {
+            setSelectedWorkspace(ws);
+            router.push(`/workspaces/${ws.id}`);
+          }
         }}
       >
         <SelectTrigger className="select-none w-60">
-          <div className="flex justify-start items-center gap-1">
-            <User className="size-4" />
-            <SelectValue placeholder="Select workspace" />
+          <div className="flex justify-start items-center gap-1 min-w-0 w-full">
+            <User className="size-4 shrink-0" />
+            <div className="truncate min-w-0">
+              <SelectValue placeholder="Select workspace" />
+            </div>
           </div>
         </SelectTrigger>
 
-        <SelectContent className="w-60">
+        <SelectContent className="w-60 max-w-60">
           {workspaces?.map((ws) => (
-            <SelectItem key={ws.id} value={ws.id}>
-              {ws.name.charAt(0).toUpperCase() + ws.name.slice(1)}
+            <SelectItem
+              key={ws.id}
+              value={ws.id}
+              className="w-full overflow-hidden"
+            >
+              <div className="flex justify-start items-center gap-1 min-w-0 w-full">
+                <span className="truncate whitespace-nowrap overflow-hidden w-full">
+                  {ws.name.charAt(0).toUpperCase() + ws.name.slice(1)}
+                </span>
+              </div>
             </SelectItem>
           ))}
 

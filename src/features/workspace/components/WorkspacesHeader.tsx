@@ -21,7 +21,7 @@ export const WorkspacesHeader = async () => {
           <InviteMember />
           <WorkspaceSelector />
           {/* @ts-ignore */}
-          <UserButton user={user} size="sm" />
+          <UserButton user={user} />
         </div>
       </div>
     </header>
