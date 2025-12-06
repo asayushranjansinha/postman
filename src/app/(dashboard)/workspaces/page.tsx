@@ -3,7 +3,13 @@ import { redirect } from "next/navigation";
 import { getWorkspaces } from "@/features/workspace/actions";
 
 export default async function WorkspacesPage() {
-  const { workspaces } = await getWorkspaces();
+  const result = await getWorkspaces();
+  const workspaces = result.workspaces;
+
+  // Error
+  if (result.error) {
+    throw new Error(result.error);
+  }
 
   // Redirect to first workspace if available
   if (workspaces && workspaces.length > 0) {

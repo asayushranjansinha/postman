@@ -25,6 +25,20 @@ export const addRequestToCollection = async (
   }
 
   try {
+    // Verify user owns the collection
+    const collection = await prisma.collection.findUnique({
+      where: { id: collectionId },
+      include: { workspace: true },
+    });
+
+    if (!collection) {
+      return { success: false, error: "Collection not found" };
+    }
+
+    if (collection.workspace.ownerId !== user.id) {
+      return { success: false, error: "Forbidden" };
+    }
+
     // Create the request
     const newRequest = await prisma.request.create({
       data: {
@@ -61,6 +75,24 @@ export const saveRequest = async (request: RequestModel) => {
   }
 
   try {
+    // Verify user owns the collection
+    const existingRequest = await prisma.request.findUnique({
+      where: { id: request.id },
+      include: {
+        collection: {
+          include: { workspace: true },
+        },
+      },
+    });
+
+    if (!existingRequest) {
+      return { success: false, error: "Request not found" };
+    }
+
+    if (existingRequest.collection.workspace.ownerId !== user.id) {
+      return { success: false, error: "Forbidden" };
+    }
+
     const updatedRequest = await prisma.request.update({
       where: {
         id: request.id,
@@ -98,6 +130,19 @@ export const getAllRequestsInCollection = async (collectionId: string) => {
   }
 
   try {
+    // Verify user owns the collection
+    const collection = await prisma.collection.findUnique({
+      where: { id: collectionId },
+      include: { workspace: true },
+    });
+
+    if (!collection) {
+      return { success: false, error: "Collection not found" };
+    }
+
+    if (collection.workspace.ownerId !== user.id) {
+      return { success: false, error: "Forbidden" };
+    }
     const requests = await prisma.request.findMany({
       where: {
         collectionId,
@@ -150,7 +195,7 @@ export const updateRequest = async (
     }
 
     if (request.collection.workspace.ownerId !== user.id) {
-       return { success: false, error: "Forbidden" };
+      return { success: false, error: "Forbidden" };
     }
 
     const updatedRequest = await prisma.request.update({
@@ -208,7 +253,7 @@ export const deleteRequest = async (requestId: string) => {
       where: { id: requestId },
     });
 
-    return { success: true };
+    return { success: true, collectionId: request.collectionId };
   } catch (error) {
     console.error("Error deleting request:", error);
     return { success: false, error: "Failed to delete request" };

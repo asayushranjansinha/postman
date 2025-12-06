@@ -95,10 +95,11 @@ export function useDeleteRequestMutation() {
 
   return useMutation({
     mutationFn: (requestId: string) => deleteRequest(requestId),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (!data.success || !data.collectionId) return;
       // Invalidate the requests query
       queryClient.invalidateQueries({
-        queryKey: ["requests"],
+        queryKey: ["requests", data.collectionId],
       });
     },
   });
