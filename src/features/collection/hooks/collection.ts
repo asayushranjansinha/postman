@@ -51,8 +51,9 @@ export const useDeleteCollection = () => {
   return useMutation({
     mutationFn: (collectionId: string) => deleteCollectionById(collectionId),
     onSuccess(data) {
+      if (!data.success || !data.collection) return;
       client.invalidateQueries({
-        queryKey: ["collections", data.collection?.workspaceId],
+        queryKey: ["collections", data.collection.workspaceId],
       });
     },
   });
@@ -73,8 +74,9 @@ export const useUpdateCollection = () => {
       name: string;
     }) => updateCollection(collectionId, name),
     onSuccess(data) {
+      if (!data.success || !data.collection) return;
       client.invalidateQueries({
-        queryKey: ["collections", data.collection?.workspaceId],
+        queryKey: ["collections", data.collection.workspaceId],
       });
     },
   });

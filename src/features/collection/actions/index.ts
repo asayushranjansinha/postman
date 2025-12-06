@@ -15,6 +15,20 @@ export const createCollection = async (workspaceId: string, name: string) => {
     throw new Error("Unauthorized");
   }
   try {
+    const workspace = await prisma.workspace.findFirst({
+      where: {
+        id: workspaceId,
+        members: {
+          some: {
+            userId: user.id,
+          },
+        },
+      },
+    });
+    if (!workspace) {
+      return { success: false, error: "Workspace not found or access denied" };
+    }
+
     const newCollection = await prisma.collection.create({
       data: {
         name,
@@ -46,6 +60,7 @@ export const getCollections = async (workspaceId: string) => {
   try {
     const collections = await prisma.collection.findMany({
       where: {
+        workspaceId,
         workspace: {
           members: {
             some: {

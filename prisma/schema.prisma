@@ -129,7 +129,7 @@ enum Member {
 model Collection {
   id String @id @default(cuid())
 
-  name String @unique
+  name String
 
   // Relations
   workspaceId String
