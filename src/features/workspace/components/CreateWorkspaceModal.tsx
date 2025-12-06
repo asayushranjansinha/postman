@@ -1,6 +1,7 @@
 // CreateWorkspace.tsx
 "use client";
 import { toast } from "sonner";
+
 import Modal from "@/components/shared/Modal";
 import { useCreateWorkspace } from "../hooks/workspace";
 import {
@@ -8,28 +9,20 @@ import {
   CreateWorkspaceFormValues,
 } from "./CreateWorkspaceForm";
 
-interface CreateWorkspaceProps {
+interface CreateWorkspaceModalProps {
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
 }
 
-const CreateWorkspace = ({
+const CreateWorkspaceModal = ({
   isModalOpen,
   setIsModalOpen,
-}: CreateWorkspaceProps) => {
+}: CreateWorkspaceModalProps) => {
   const createWorkspace = useCreateWorkspace();
 
   const handleSubmit = (values: CreateWorkspaceFormValues) => {
     createWorkspace.mutate(values.name, {
       onSuccess(data) {
-        // Check for silent failures
-        if (!data?.success || !data.workspace) {
-          toast.error("Failed to create workspace", {
-            description: data?.error ?? "Unknown error occurred",
-          });
-          return;
-        }
-
         toast.success(
           `Workspace "${data.workspace?.name}" created successfully`,
           {
@@ -67,4 +60,4 @@ const CreateWorkspace = ({
   );
 };
 
-export default CreateWorkspace;
+export default CreateWorkspaceModal;

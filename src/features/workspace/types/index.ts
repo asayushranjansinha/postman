@@ -1,3 +1,4 @@
+
 export interface WorkspaceProps {
   id: string;
   name: string;
@@ -7,3 +8,4 @@ export interface WorkspaceProps {
   updatedAt: string;
   //   members: MemberProps[];
 }
+

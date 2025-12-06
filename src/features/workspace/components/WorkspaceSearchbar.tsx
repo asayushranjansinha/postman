@@ -47,9 +47,9 @@ export const WorkspaceSearchbar = ({ className }: WorkspaceSearchbarProps) => {
         </span>
       </Button>
 
-      <CommandDialog open={open} onOpenChange={setOpen} className="p-2">
+      <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder="Type a command or search..." />
-        <CommandList>
+        <CommandList className="py-2">
           <CommandEmpty>No results found.</CommandEmpty>
 
           <CommandGroup heading="Suggestions" style={{ paddingBottom: "12px" }}>
