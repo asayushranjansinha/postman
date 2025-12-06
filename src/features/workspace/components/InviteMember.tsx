@@ -1,7 +1,6 @@
 "use client";
 
 import { CheckIcon, CopyIcon, Link as LinkIcon, UserPlus } from "lucide-react";
-import { useState } from "react";
 
 import { Hint } from "@/components/shared/Hint";
 import { Button } from "@/components/ui/button";
@@ -18,15 +17,12 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 
 export const InviteMember = () => {
-  const [copied, setIsCopied] = useState(false);
+  const { copyFn, copied } = useCopyToClipboard();
   const generateInviteLink = async () => {};
-  const copyToClipboard = async () => {
-    // TODO: Implement clipboard copy logic
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
-  };
+
   return (
     <DropdownMenu>
       <Hint label="Invite Member">
@@ -51,7 +47,7 @@ export const InviteMember = () => {
                 title="Copy"
                 size="icon-xs"
                 onClick={() => {
-                  copyToClipboard();
+                  copyFn("https://x.com/shadcn");
                 }}
               >
                 {copied ? <CheckIcon /> : <CopyIcon />}

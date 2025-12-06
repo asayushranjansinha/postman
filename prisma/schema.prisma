@@ -135,8 +135,40 @@ model Collection {
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
+  requests Request[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([name, workspaceId])
+}
+
+/**
+ * REQUESTS
+ */
+model Request {
+  id     String        @id @default(cuid())
+  name   String
+  method RequestMethod @default(GET)
+  url    String
+
+  parameters Json?
+  headers    Json?
+  body       Json?
+  response   Json?
+
+  // Relations
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum RequestMethod {
+  GET
+  PUT
+  POST
+  PATCH
+  DELETE
 }
