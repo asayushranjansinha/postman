@@ -105,7 +105,11 @@ model WorkspaceMember {
 
   role Member @default(MEMBER)
 
+<<<<<<< HEAD
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+=======
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+>>>>>>> 9925d9d (feat: Implement workspace core features, server actions, Prisma schema updates, and Tanstack Query integration and downgrade to next 15.5.7 to fix tailwind css issues)
   workspaceId String
 
   userId String
