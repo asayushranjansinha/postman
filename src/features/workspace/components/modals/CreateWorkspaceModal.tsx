@@ -6,7 +6,7 @@ import { Modal } from "@/components/shared/Modal";
 import {
   WorkspaceForm,
   WorkspaceFormValues,
-} from "@/features/workspace/components/forms/CreateWorkspaceForm";
+} from "@/features/workspace/components/forms/WorkspaceForm";
 import { useCreateWorkspaceMutation } from "@/features/workspace/mutations";
 import { useRouter } from "next/navigation";
 

@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 
 import { Modal } from "@/components/shared/Modal";
 import {
-    WorkspaceForm,
-    WorkspaceFormValues,
-} from "@/features/workspace/components/forms/CreateWorkspaceForm";
+  WorkspaceForm,
+  WorkspaceFormValues,
+} from "@/features/workspace/components/forms/WorkspaceForm";
 import { useRenameWorkspaceMutation } from "@/features/workspace/mutations";
 
 interface RenameWorkspaceData {

@@ -8,7 +8,7 @@ import { useGetWorkspaceQuery } from "../queries";
 import { DATETIME_FORMAT, TIMESTAMP_FORMAT } from "@/constants/time"; 
 import { RenameWorkspaceModal } from "./modals/RenameWorkspaceModal";
 
-import { DeleteWorkspaceModal } from "./modals/DeleteRequestModal"; 
+import { DeleteWorkspaceModal } from "./modals/DeleteWorkspaceModal"; 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge"; 
 import { Separator } from "@/components/ui/separator";

@@ -171,9 +171,12 @@ export async function getWorkspace(workspaceId: string) {
     console.debug("[getWorkspace]: Getting workspace");
 
     const workspace = await prisma.workspace.findUnique({
-      where: {
-        id: workspaceId,
-        ownerId: data.user.id,
+       where: {
+        id:workspaceId,
+        OR: [
+          { ownerId: data.user.id },
+          { members: { some: { userId: data.user.id } } },
+        ],
       },
       include: {
         collections: {

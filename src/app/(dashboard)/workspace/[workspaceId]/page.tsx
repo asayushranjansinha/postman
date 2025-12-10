@@ -1,4 +1,3 @@
-import React from "react";
 import {
   dehydrate,
   HydrationBoundary,
@@ -10,8 +9,10 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { getWorkspace } from "@/features/workspace/server/actions";
+import { getCollectionsByWorkspace } from "@/features/collection/server/actions";
 import { WorkspaceDetailsClient } from "@/features/workspace/components/WorkspaceDetailsClient";
+import { getWorkspace } from "@/features/workspace/server/actions";
+import { WorkspaceSidebar } from "@/features/workspace/components/WorkspaceSidebar";
 
 type PageProps = {
   params: {
@@ -30,6 +31,12 @@ export default async function WorkspaceDetailsPage({ params }: PageProps) {
     queryFn: () => getWorkspace(workspaceId),
   });
 
+  // Prefetch collections in this workspace
+  await queryClient.fetchQuery({
+    queryKey: ["collections", workspaceId],
+    queryFn: () => getCollectionsByWorkspace(workspaceId),
+  });
+
   return (
     // HydrationBoundary
     <HydrationBoundary state={dehydrate(queryClient)}>
@@ -37,7 +44,7 @@ export default async function WorkspaceDetailsPage({ params }: PageProps) {
         <ResizablePanel defaultSize={65} minSize={40}>
           <div className="h-svh w-full overflow-y-scroll">
             <div className="flex flex-col items-center h-full justify-center">
-            TODO: RequestPlayground
+              TODO: RequestPlayground
               <WorkspaceDetailsClient workspaceId={workspaceId} />
             </div>
           </div>
@@ -50,7 +57,7 @@ export default async function WorkspaceDetailsPage({ params }: PageProps) {
           className="flex"
         >
           <div className="h-full w-full overflow-hidden">
-            TODO : Secondary Sidebar
+            <WorkspaceSidebar />
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
