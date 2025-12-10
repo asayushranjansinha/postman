@@ -6,6 +6,7 @@ import {
 
 import { CreateWorkspaceButton } from "@/features/workspace/components/CreateWorkspaceButton";
 import { listWorkspaces } from "@/features/workspace/server/actions";
+import { WorkspaceListClient } from "@/features/workspace/components/WorkspaceListClient";
 
 async function WorkspacesPage() {
   const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ async function WorkspacesPage() {
         <div className="flex items-center justify-center">
           <CreateWorkspaceButton />
         </div>
+        <WorkspaceListClient />
       </div>
     </HydrationBoundary>
   );

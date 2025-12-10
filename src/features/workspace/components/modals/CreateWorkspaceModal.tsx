@@ -4,8 +4,8 @@ import { toast } from "sonner";
 
 import { Modal } from "@/components/shared/Modal";
 import {
-  CreateWorkspaceForm,
-  CreateWorkspaceFormValues,
+  WorkspaceForm,
+  WorkspaceFormValues,
 } from "@/features/workspace/components/forms/CreateWorkspaceForm";
 import { useCreateWorkspaceMutation } from "@/features/workspace/mutations";
 import { useRouter } from "next/navigation";
@@ -22,7 +22,7 @@ export const CreateWorkspaceModal = ({
   const router = useRouter();
   const createWorkspace = useCreateWorkspaceMutation();
 
-  const handleCreateWorkspace = (values: CreateWorkspaceFormValues) => {
+  const handleCreateWorkspace = (values: WorkspaceFormValues) => {
     createWorkspace.mutate(
       {
         name: values.name,
@@ -34,9 +34,12 @@ export const CreateWorkspaceModal = ({
               description: data.message,
             });
           } else {
-            toast.success(`Workspace "${data.data.name}" created successfully`, {
-              description: "Redirecting to workspace page",
-            });
+            toast.success(
+              `Workspace "${data.data.name}" created successfully`,
+              {
+                description: "Redirecting to workspace page",
+              }
+            );
             router.push(`/workspace/${data.data.id}`);
             setIsModalOpen(false);
           }
@@ -65,7 +68,7 @@ export const CreateWorkspaceModal = ({
       isOpen={isModalOpen}
       onClose={handleCancel}
     >
-      <CreateWorkspaceForm
+      <WorkspaceForm
         onSubmit={handleCreateWorkspace}
         onCancel={handleCancel}
         isSubmitting={createWorkspace.isPending}
