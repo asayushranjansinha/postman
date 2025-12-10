@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -18,6 +17,10 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+
+  // Relations
+  workspaces  Workspace[]       @relation("UserWorkspaces")
+  memberships WorkspaceMember[]
 
   @@unique([email])
   @@map("user")
@@ -69,4 +72,169 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+/**
+ * WORKSPACE RELATED
+ */
+
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+
+  // Relations
+  ownerId String
+  owner   User   @relation("UserWorkspaces", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  collections  Collection[]
+  environments Environment[]
+  members      WorkspaceMember[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, ownerId])
+}
+
+model WorkspaceMember {
+  id String @id @default(cuid())
+
+  role Member @default(MEMBER)
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([workspaceId, userId])
+}
+
+/**
+ * COLLECTION RELATED
+ */
+
+model Collection {
+  id          String    @id @default(cuid())
+  name        String
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  requests Request[]
+}
+
+/**
+ * REQUEST RELATED
+ */
+
+model Request {
+  id     String     @id @default(cuid())
+  name   String
+  method HttpMethod
+  url    String
+
+  body String? // raw body text
+
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  headers     RequestHeader[]
+  queryParams RequestQueryParam[]
+  runs        RequestRun[]
+}
+
+/**
+ * RESPONSE RELATED
+ */
+model RequestHeader {
+  id        String  @id @default(cuid())
+  requestId String
+  request   Request @relation(fields: [requestId], references: [id])
+
+  key   String
+  value String
+}
+
+model RequestQueryParam {
+  id        String  @id @default(cuid())
+  requestId String
+  request   Request @relation(fields: [requestId], references: [id])
+
+  key   String
+  value String
+}
+
+model RequestRun {
+  id        String  @id @default(cuid())
+  requestId String
+  request   Request @relation(fields: [requestId], references: [id])
+
+  executedAt DateTime @default(now())
+  status     Int?
+  body       String?
+  durationMs Int?
+  error      String?
+
+  headers ResponseHeader[]
+}
+
+model ResponseHeader {
+  id    String     @id @default(cuid())
+  runId String
+  run   RequestRun @relation(fields: [runId], references: [id])
+
+  key   String
+  value String
+}
+
+/**
+ * ENVIRONMENT RELATED
+ */
+model Environment {
+  id          String    @id @default(cuid())
+  name        String
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  variables EnvironmentVariable[]
+}
+
+model EnvironmentVariable {
+  id            String      @id @default(cuid())
+  environmentId String
+  environment   Environment @relation(fields: [environmentId], references: [id])
+
+  key   String
+  value String
+}
+
+/**
+ * ENUMS
+ */
+enum HttpMethod {
+  GET
+  POST
+  PUT
+  PATCH
+  DELETE
+  HEAD
+  OPTIONS
+}
+
+enum Member {
+  OWNER
+  ADMIN
+  MEMBER
 }
