@@ -5,12 +5,17 @@ import {
   createRequest,
   deleteRequest,
   runRequest,
+  saveUnsavedRequest,
   updateRequest,
   updateRequestBody,
   upsertRequestHeaders,
   upsertRequestQueryParams,
 } from "../server/action";
-import { PrismaRequestRun } from "../types";
+import {
+  PrismaRequestDetails,
+  PrismaRequestRun,
+  SaveUnsavedRequestInput,
+} from "../types";
 
 /**
  * Hook to create a new request
@@ -158,7 +163,6 @@ export const useUpdateRequestQueryParamsMutation = (requestId: string) => {
   });
 };
 
-
 /**
  * Hook to execute a request, save the run history, and receive the response data.
  * This should be used for actual API execution.
@@ -196,6 +200,46 @@ export const useRunRequestMutation = () => {
       } else {
         console.error(
           "Request execution failed (Server Action Error):",
+          response.message
+        );
+      }
+    },
+    onError(error) {
+      console.error("Mutation failed (Client Error):", error);
+    },
+  });
+};
+
+/**
+ * Hook to save a new request that currently exists only in the client store
+ * into a permanent collection in the database.
+ * * @returns data - The newly created PrismaRequestDetails with its permanent ID
+ */
+export const useSaveUnsavedRequestMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: SaveUnsavedRequestInput) => {
+      // The payload structure matches the required input for saveUnsavedRequest
+      return saveUnsavedRequest(payload);
+    },
+
+    onSuccess(response) {
+      if (response.success && response.data) {
+        const newRequest: PrismaRequestDetails = response.data;
+
+        // 1. Invalidate the general list of requests to show the new item in the sidebar/collection view.
+        queryClient.invalidateQueries({
+          queryKey: ["requests"],
+        });
+
+        // 2. Invalidate queries related to the collection, as its contents have changed.
+        queryClient.invalidateQueries({
+          queryKey: ["requestsByCollection", newRequest.collectionId],
+        });
+      } else {
+        console.error(
+          "Save Unsaved Request failed (Server Action Error):",
           response.message
         );
       }

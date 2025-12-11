@@ -8,6 +8,13 @@ export interface CreateRequestInput {
   collectionId: string;
 }
 
+export interface SaveUnsavedRequestInput extends CreateRequestInput {
+  body: string | null;
+  headers: { key: string; value: string }[];
+  queryParams: { key: string; value: string }[];
+  collectionId: string;
+}
+
 export interface UpdateRequestInput {
   id: string;
   name: string;

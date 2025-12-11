@@ -21,8 +21,6 @@ const EDITOR_TABS = {
   BODY: "body",
 } as const;
 
-type EditorTabKey = (typeof EDITOR_TABS)[keyof typeof EDITOR_TABS];
-
 export const RequestEditorContent = ({
   onSend,
   isSending,
@@ -42,12 +40,6 @@ export const RequestEditorContent = ({
 
   return (
     <div className="flex flex-col flex-1 overflow-y-auto">
-      <header className="flex items-center justify-between p-3 border-b bg-muted/30">
-        <h2 className="text-lg font-semibold truncate text-muted-foreground">
-          Editing: {activeRequest.name}
-        </h2>
-      </header>
-
       <div className="p-4 border-b">
         <RequestUrlEditor
           tab={activeRequest}

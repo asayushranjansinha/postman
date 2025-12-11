@@ -1,9 +1,9 @@
 "use client";
 
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { RequestRunResponseViewer } from "@/features/request/components/response-viewer";
 import { useActiveRequestSync } from "@/features/request/hooks/useActiveRequestSync";
-import { useRunRequestMutation } from "@/features/request/mutations"; 
-
 import { useRequestEditorStore } from "@/features/request/store/useRequestEditorStore";
 import { RequestEditorContent } from "./RequestEditorContent";
 import { RequestTabsHeader } from "./RequestTabsHeader";
@@ -13,97 +13,92 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { PrismaRequestRun } from "../../types";
+import { useRequestSaveHotkey } from "@/features/request/hooks/hotkeys/useRequestSaveHotkey";
+import { useRequestExecution } from "@/features/request/hooks/useRequestExecution";
+import { useNewRequestHotkey } from "@/features/request/hooks/hotkeys/useNewRequestHotkey";
 
+import { SaveRequestModal } from "@/features/request/components/modals/SaveRequestModal"; 
+import { SaveIcon } from "lucide-react"; 
 
 export const RequestPlayground = () => {
-  useActiveRequestSync();
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false); 
 
-  const { openTabIds, activeRequestId } = useRequestEditorStore();
+  useActiveRequestSync();
+  useRequestSaveHotkey();
+  useNewRequestHotkey();
+
+  const { openTabIds, activeRequestId, tabs } = useRequestEditorStore();
+  
+  // Safely access the active request
+  const activeRequest = tabs[activeRequestId!] || {}; 
   const hasOpenTabs = openTabIds.length > 0;
 
-  const executeMutation = useRunRequestMutation();
+  const { isLoading, lastRun, handleSend } = useRequestExecution();
+
+  // Determine if the request is unsaved
+  const isUnsaved = !activeRequest.isSaved;
   
-  const isLoading = executeMutation.isPending;
-
-  const { setTabData: updateStoreTabData } = useRequestEditorStore();
-
-  const activeRequest = activeRequestId
-    ? useRequestEditorStore.getState().tabs[activeRequestId]
-    : null;
-  const lastRun = activeRequest?.lastRun || null;
-
-  const handleSend = () => {
-    if (!activeRequestId) return;
-
-    executeMutation.mutate(activeRequestId, {
-      onSuccess: (response) => {
-        if (response.success && response.data) {
-          // The response.data is the real PrismaRequestRun, update the store.
-          // This path handles successful server action AND successful/failed external HTTP calls (2xx, 4xx, 5xx).
-          updateStoreTabData(activeRequestId, {
-            lastRun: response.data,
-          });
-        } else {
-          // This path handles failed server actions (e.g., Auth error, Network error that was thrown)
-          updateStoreTabData(activeRequestId, {
-            // Cast the error object to the expected run structure for display
-            lastRun: {
-              id: `error_run_${Date.now()}`,
-              requestId: activeRequestId,
-              executedAt: new Date(),
-              status: 0, 
-              body: null,
-              durationMs: 0,
-              // The message contains the error reason (e.g., "External Request Failed: ECONNREFUSED...")
-              error: `Server Action Error: ${response.message}`,
-              headers: [],
-            } as PrismaRequestRun,
-          });
-        }
-      },
-      onError: (error) => {
-        // Handle client mutation error (e.g., network error before hitting the server action)
-        console.error("[UI - Playground] Client mutation error:", error);
-        updateStoreTabData(activeRequestId, {
-          lastRun: {
-            id: `client_error_${Date.now()}`,
-            requestId: activeRequestId,
-            executedAt: new Date(),
-            status: 0,
-            body: null,
-            durationMs: 0,
-            error: `Client/Network Error: ${error.message}`,
-            headers: [],
-          } as PrismaRequestRun,
-        });
-      },
-    });
-  };
+  const openSaveModal = () => setIsSaveModalOpen(true);
+  const handleCloseSaveModal = () => setIsSaveModalOpen(false);
 
   return (
     <div className="flex flex-col w-full h-full">
       <RequestTabsHeader />
 
       {hasOpenTabs && activeRequestId ? (
-        <ResizablePanelGroup direction="vertical" className="flex-1">
-          <ResizablePanel defaultSize={65} minSize={20}>
-            <div className="flex flex-col h-full overflow-y-auto border-b">
-              <RequestEditorContent onSend={handleSend} isSending={isLoading} />
-            </div>
-          </ResizablePanel>
+        <>
+          <ResizablePanelGroup direction="vertical" className="flex-1">
+            <ResizablePanel defaultSize={65} minSize={20}>
+              <div className="flex flex-col h-full overflow-y-auto border-b">
+                <header className="flex items-center justify-between p-3 border-b bg-muted/30">
+                  <h2 className="flex items-center text-lg font-semibold truncate text-muted-foreground">
+                    Editing: {activeRequest.name}
+                    
+                    {/* Unsaved Indicator (Small Dot) */}
+                    {isUnsaved && (
+                      <span 
+                        className="ml-2 h-2 w-2 rounded-full bg-yellow-500 
+                                   shadow-md ring-1 ring-yellow-300/50" 
+                        title="Unsaved Changes"
+                      />
+                    )}
+                  </h2>
+                  
+                  {/* Save Button - Only show if the request is unsaved */}
+                  {isUnsaved && (
+                    <Button 
+                      size="sm"
+                      variant="default"
+                      onClick={openSaveModal}
+                      className="ml-4"
+                    >
+                      <SaveIcon className="w-4 h-4 mr-2" />
+                      Save
+                    </Button>
+                  )}
+                </header>
+                <RequestEditorContent onSend={handleSend} isSending={isLoading} />
+              </div>
+            </ResizablePanel>
 
-          <ResizableHandle withHandle={true} />
+            <ResizableHandle withHandle={true} />
 
-          <ResizablePanel defaultSize={35} minSize={20}>
-            <div className="flex flex-col h-full overflow-y-auto">
-              <RequestRunResponseViewer
-                runData={lastRun}
-                isLoading={isLoading}
-              />
-            </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+            <ResizablePanel defaultSize={35} minSize={20}>
+              <div className="flex flex-col h-full overflow-y-auto">
+                <RequestRunResponseViewer
+                  runData={lastRun}
+                  isLoading={isLoading}
+                />
+              </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+          
+          {/* Save Request Modal */}
+          <SaveRequestModal
+            isModalOpen={isSaveModalOpen}
+            setIsModalOpen={handleCloseSaveModal}
+          />
+        </>
       ) : (
         <div className="flex-1 flex items-center justify-center text-muted-foreground">
           <div className="text-center p-4">

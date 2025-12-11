@@ -13,6 +13,7 @@ import {
   PrismaRequest,
   PrismaRequestDetails,
   PrismaRequestRun,
+  SaveUnsavedRequestInput,
   UpdateRequestInput,
 } from "../types";
 
@@ -41,7 +42,6 @@ async function verifyRequestAccess(
   });
 
   if (!accessCheck) {
-    console.debug("[verifyRequestAccess]: Request not found", { requestId });
     throw new Error("Request not found");
   }
 
@@ -50,11 +50,6 @@ async function verifyRequestAccess(
   const allowed = await checkWorkspaceAccess(userId, workspaceId);
 
   if (!allowed) {
-    console.debug("[verifyRequestAccess]: Forbidden", {
-      userId,
-      workspaceId,
-      requestId,
-    });
     throw new Error("Forbidden");
   }
 
@@ -70,19 +65,15 @@ export async function createRequest(
   input: CreateRequestInput
 ): Promise<ServerActionResponse<PrismaRequest | null>> {
   try {
-    console.debug("[createRequest]: Creating request");
-
     // Check Authentication
     const data = await getAuth();
     if (!data || !data.user) {
-      console.debug("[createRequest]: Unauthorized");
       throw new Error("Unauthorized");
     }
 
     // Check Workspace Access
     const allowed = await checkWorkspaceAccess(data.user.id, input.workspaceId);
     if (!allowed) {
-      console.debug("[createRequest]: Forbidden");
       throw new Error("Forbidden");
     }
 
@@ -94,10 +85,6 @@ export async function createRequest(
         method: input.method,
         collectionId: input.collectionId,
       },
-    });
-
-    console.debug("[createRequest]: Request created", {
-      requestId: request.id,
     });
 
     return {
@@ -119,17 +106,9 @@ export async function getRequestsByCollectionId(
   collectionId: string
 ): Promise<ServerActionResponse<PrismaRequestDetails[] | null>> {
   try {
-    console.debug(
-      "[getRequestsByCollectionId]: Getting requests by collection id",
-      {
-        collectionId,
-      }
-    );
-
     // Check Authentication
     const data = await getAuth();
     if (!data || !data.user) {
-      console.debug("[getRequestsByCollectionId]: Unauthorized");
       throw new Error("Unauthorized");
     }
     // Get collection
@@ -148,7 +127,6 @@ export async function getRequestsByCollectionId(
       collection.workspaceId
     );
     if (!allowed) {
-      console.debug("[getRequestsByCollectionId]: Forbidden");
       throw new Error("Forbidden");
     }
 
@@ -162,13 +140,8 @@ export async function getRequestsByCollectionId(
         queryParams: true,
       },
       orderBy: {
-        createdAt: 'desc', // Sort by creation time in descending order
+        createdAt: "desc", // Sort by creation time in descending order
       },
-    });
-
-    console.debug("[getRequestsByCollectionId]: Requests retrieved", {
-      collectionId,
-      requestsCount: requests.length,
     });
 
     return {
@@ -194,22 +167,15 @@ export async function updateRequest(
   input: UpdateRequestInput
 ): Promise<ServerActionResponse<PrismaRequest | null>> {
   try {
-    console.debug("[updateRequest]: Updating request", {
-      requestId: input.id,
-      collectionId,
-    });
-
     // 1. Check Authentication
     const data = await getAuth();
     if (!data || !data.user) {
-      console.debug("[updateRequest]: Unauthorized");
       throw new Error("Unauthorized");
     }
 
     // 2. Check Workspace Access
     const allowed = await checkWorkspaceAccess(data.user.id, workspaceId);
     if (!allowed) {
-      console.debug("[updateRequest]: Forbidden");
       throw new Error("Forbidden");
     }
 
@@ -223,10 +189,6 @@ export async function updateRequest(
         url: input.url,
         method: input.method,
       },
-    });
-
-    console.debug("[updateRequest]: Request updated", {
-      requestId: updatedRequest.id,
     });
 
     return {
@@ -248,30 +210,20 @@ export async function deleteRequest(
   requestId: string
 ): Promise<ServerActionResponse<null>> {
   try {
-    console.debug("[deleteRequest]: Attempting to delete request", {
-      requestId,
-    });
-
     // 1. Check Authentication
     const data = await getAuth();
     if (!data || !data.user) {
-      console.debug("[deleteRequest]: Unauthorized");
       throw new Error("Unauthorized");
     }
 
     // 2. Optimized access check
     await verifyRequestAccess(data.user.id, requestId);
-    // Note: verifyRequestAccess handles logging for not found/forbidden.
 
     // 3. Delete the request
     await prisma.request.delete({
       where: {
         id: requestId,
       },
-    });
-
-    console.debug("[deleteRequest]: Request deleted successfully", {
-      requestId,
     });
 
     return {
@@ -293,8 +245,6 @@ export async function getRequestDetailsById(
   requestId: string
 ): Promise<ServerActionResponse<PrismaRequestDetails | null>> {
   try {
-    console.debug("[getRequestDetailsById]: Fetching", { requestId });
-
     const request = await prisma.request.findUnique({
       where: { id: requestId },
       include: {
@@ -304,7 +254,6 @@ export async function getRequestDetailsById(
     });
 
     if (!request) {
-      console.debug("[getRequestDetailsById]: Request not found");
       throw new Error("Request not found");
     }
 
@@ -329,11 +278,8 @@ export async function updateRequestBody(
   body: string
 ): Promise<ServerActionResponse<null>> {
   try {
-    console.debug("[updateRequestBody]: Updating body", { requestId });
-
     const data = await getAuth();
     if (!data?.user) {
-      console.debug("[updateRequestBody]: Unauthorized");
       throw new Error("Unauthorized");
     }
 
@@ -363,12 +309,9 @@ export async function upsertRequestHeaders(
   headers: { id?: string; key: string; value: string }[]
 ): Promise<ServerActionResponse<null>> {
   try {
-    console.debug("[upsertRequestHeaders]: Updating headers", { requestId });
-
     // 1. Check auth
     const data = await getAuth();
     if (!data?.user) {
-      console.debug("[upsertRequestHeaders]: Unauthorized");
       throw new Error("Unauthorized");
     }
 
@@ -407,14 +350,9 @@ export async function upsertRequestQueryParams(
   queryParams: { id?: string; key: string; value: string }[]
 ): Promise<ServerActionResponse<null>> {
   try {
-    console.debug("[upsertRequestQueryParams]: Updating query params", {
-      requestId,
-    });
-
     // 1. Authenticate
     const data = await getAuth();
     if (!data?.user) {
-      console.debug("[upsertRequestQueryParams]: Unauthorized");
       throw new Error("Unauthorized");
     }
 
@@ -450,15 +388,11 @@ export async function runRequest(
   requestId: string
 ): Promise<ServerActionResponse<PrismaRequestRun | null>> {
   try {
-    console.debug("[runRequest]: Starting execution for request", {
-      requestId,
-    });
     const executedAt = new Date();
 
     // 1 & 2. Authentication and Access Checks (omitted for brevity, remain the same)
     const authData = await getAuth();
     if (!authData?.user) {
-      console.debug("[runRequest]: Unauthorized");
       throw new Error("Unauthorized");
     }
     await verifyRequestAccess(authData.user.id, requestId);
@@ -475,7 +409,6 @@ export async function runRequest(
     });
 
     if (!requestDetails) {
-      console.debug("[runRequest]: Request not found during fetch");
       throw new Error("Request not found");
     }
 
@@ -490,19 +423,13 @@ export async function runRequest(
     // 3. Execute the actual HTTP Request
     const runResult = await executeHttpRequest(executionDetails);
 
-    // --- [START] FIX: Explicitly fail the Server Action on External Request Error ---
+    // FIX: Explicitly fail the Server Action on External Request Error
     if (runResult.error) {
-      // Log the failure, but then throw an error to trigger the outer handleServerError
-      console.warn(
-        "[runRequest]: External request failed, rejecting server action.",
-        { error: runResult.error }
-      );
-      // The message here will be wrapped by handleServerError
-      throw new Error(`External Request Failed: ${runResult.error}`);
+      // The error is logged inside handleServerError (outer catch block)
+      throw new Error(runResult.error);
     }
-    // --- [END] FIX: Explicitly fail the Server Action on External Request Error ---
 
-    // 4. Create RequestRun and ResponseHeaders in an INTERACTIVE TRANSACTION (Unchanged from last fix)
+    // 4. Create RequestRun and ResponseHeaders in an INTERACTIVE TRANSACTION
     const fullRequestRun = await prisma.$transaction(async (tx) => {
       // 4a. Create the RequestRun record FIRST to get its ID
       const requestRun = await tx.requestRun.create({
@@ -512,7 +439,7 @@ export async function runRequest(
           status: runResult.status,
           body: runResult.body,
           durationMs: runResult.durationMs,
-          error: runResult.error, // Will be null if we passed the check above
+          error: runResult.error, // This is null due to the check above
         },
       });
 
@@ -542,23 +469,17 @@ export async function runRequest(
       return finalRun;
     }); // End of interactive transaction
 
-    console.debug("[runRequest]: Request run recorded", {
-      runId: fullRequestRun.id,
-      status: fullRequestRun.status,
-    });
-
     return {
       success: true,
       data: fullRequestRun as PrismaRequestRun,
       message: "Request executed and run recorded.",
     };
   } catch (error) {
-    // This catches both authentication errors, Prisma errors, and the new error
-    // thrown when the external request fails due to a network error.
+    // This catches authentication errors, Prisma errors, and network errors (via the throw)
     return handleServerError(error, "runRequest");
   }
 }
-// Helper function to simulate/execute the actual HTTP call
+// Helper function to execute the actual HTTP call
 async function executeHttpRequest(details: ExecutionDetails): Promise<{
   status: number | null;
   body: string | null;
@@ -589,10 +510,8 @@ async function executeHttpRequest(details: ExecutionDetails): Promise<{
       url: url.toString(),
       headers: axiosHeaders,
       data: details.body,
-      // Prevents Axios from throwing an error on non-2xx status codes,
-      // allowing us to record the actual status.
+      // Prevents Axios from throwing an error on non-2xx status codes
       validateStatus: () => true,
-      // Ensure the response is treated as text/string for 'body' storage
       responseType: "text",
       timeout: 10000, // 10 second timeout
     });
@@ -613,7 +532,6 @@ async function executeHttpRequest(details: ExecutionDetails): Promise<{
     } else {
       error = "An unknown network error occurred.";
     }
-    console.error("Axios Execution Error:", error);
   } finally {
     const durationMs = Date.now() - startTime;
     return {
@@ -623,5 +541,91 @@ async function executeHttpRequest(details: ExecutionDetails): Promise<{
       error,
       responseHeaders,
     };
+  }
+}
+
+/**
+ * Save Unsaved Request
+ * Creates a new request entry in the database using the temporary data from the client store.
+ * This is used when an unsaved request (collectionId="") is saved into a collection for the first time.
+ * * @param input The request data including name, url, method, body, headers, queryParams, and target collectionId.
+ * @returns The newly created request (PrismaRequestDetails) including its new database ID.
+ */
+export async function saveUnsavedRequest(
+  input: SaveUnsavedRequestInput
+): Promise<ServerActionResponse<PrismaRequestDetails | null>> {
+  try {
+    // 1. Check Authentication
+    const data = await getAuth();
+    if (!data || !data.user) {
+      throw new Error("Unauthorized");
+    }
+
+    // 2. Check Workspace Access
+    const allowed = await checkWorkspaceAccess(data.user.id, input.workspaceId);
+    if (!allowed) {
+      throw new Error("Forbidden");
+    }
+
+    // 3. Create Request and associated details in a Transaction
+    const newRequest = await prisma.$transaction(async (tx) => {
+      // 3a. Create the Request record
+      const request = await tx.request.create({
+        data: {
+          name: input.name,
+          url: input.url,
+          method: input.method,
+          body: input.body,
+          collectionId: input.collectionId,
+        },
+      });
+
+      const newRequestId = request.id;
+
+      // 3b. Create Headers
+      if (input.headers.length > 0) {
+        await tx.requestHeader.createMany({
+          data: input.headers.map((h) => ({
+            key: h.key,
+            value: h.value,
+            requestId: newRequestId,
+          })),
+        });
+      }
+
+      // 3c. Create Query Parameters
+      if (input.queryParams.length > 0) {
+        await tx.requestQueryParam.createMany({
+          data: input.queryParams.map((p) => ({
+            key: p.key,
+            value: p.value,
+            requestId: newRequestId,
+          })),
+        });
+      }
+
+      // 3d. Re-fetch the complete details to return to the client
+      const finalRequest = await tx.request.findUnique({
+        where: { id: newRequestId },
+        include: {
+          headers: true,
+          queryParams: true,
+        },
+      });
+
+      if (!finalRequest) {
+        throw new Error("Failed to retrieve the final request after creation.");
+      }
+
+      return finalRequest;
+    }); // End of transaction
+
+    return {
+      success: true,
+      data: newRequest as PrismaRequestDetails,
+      message: "New request saved to collection.",
+    };
+  } catch (error) {
+    return handleServerError(error, "saveUnsavedRequest");
   }
 }

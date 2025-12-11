@@ -1,13 +1,14 @@
 "use client";
 import React from "react";
-
-import { ThemeProvider } from "@/components/theme/ThemeProvider";
-import { Toaster } from "@/components/ui/sonner";
+import { HotkeysProvider } from "react-hotkeys-hook";
 import {
   isServer,
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
+
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 function makeQueryClient() {
   return new QueryClient({
@@ -32,18 +33,24 @@ export function getBrowserClient() {
   }
 }
 
-export const RootProviders = ({ children }: { children: React.ReactNode }) => {
+interface RootProvidersProps
+  extends React.ComponentProps<typeof HotkeysProvider> {
+  children: React.ReactNode;
+}
+export const RootProviders = ({ children, ...props }: RootProvidersProps) => {
   const client = getBrowserClient();
 
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
-      <QueryClientProvider client={client}>{children}</QueryClientProvider>
-      <Toaster closeButton position="top-center" duration={2000} />
-    </ThemeProvider>
+    <HotkeysProvider {...props}>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <QueryClientProvider client={client}>{children}</QueryClientProvider>
+        <Toaster closeButton position="top-center" duration={2000} />
+      </ThemeProvider>
+    </HotkeysProvider>
   );
 };
