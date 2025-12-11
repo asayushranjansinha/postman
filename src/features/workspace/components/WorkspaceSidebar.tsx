@@ -40,9 +40,9 @@ export function WorkspaceSidebar() {
     <Tabs
       defaultValue={defaultValue}
       orientation="vertical"
-      className="flex h-full w-full rounded-none bg-transparent"
+      className="flex h-full w-full rounded-none bg-transparent min-w-0 overflow-hidden"
     >
-      <TabsList className="flex-col h-full rounded-none justify-start border-r py-4 gap-0.5">
+      <TabsList className="flex-col h-full rounded-none justify-start border-r py-4 gap-0.5 shrink-0">
         {sidebarTabItems.map((item) => {
           const tabValue = item.label.toLowerCase().replace(/\s/g, "-");
           const IconComponent = item.icon; // The icon component
@@ -78,13 +78,17 @@ export function WorkspaceSidebar() {
       </TabsList>
 
       {/* Content Area */}
-      <div className="grow text-start p-0">
+      <div className="grow text-start p-0 min-w-0 overflow-hidden">
         {sidebarTabItems.map((item) => {
           const tabValue = item.label.toLowerCase().replace(/\s/g, "-");
           const TabContentComponent = item.component; // Renamed variable to avoid confusion
 
           return (
-            <TabsContent value={tabValue} key={tabValue} className="p-0">
+            <TabsContent
+              value={tabValue}
+              key={tabValue}
+              className="p-0 h-full min-w-0 overflow-hidden"
+            >
               {TabContentComponent ? (
                 // Directly render the JSX element stored in item.component
                 TabContentComponent

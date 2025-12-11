@@ -15,13 +15,13 @@ import { getWorkspace } from "@/features/workspace/server/actions";
 import { WorkspaceSidebar } from "@/features/workspace/components/WorkspaceSidebar";
 
 type PageProps = {
-  params: {
+  params: Promise<{
     workspaceId: string;
-  };
+  }>;
 };
 
 export default async function WorkspaceDetailsPage({ params }: PageProps) {
-  const { workspaceId } = params;
+  const { workspaceId } = await params;
 
   const queryClient = new QueryClient();
 

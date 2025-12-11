@@ -75,10 +75,10 @@ export const CollectionTabList = ({
 
   //   List of collections
   return (
-    <div className="flex-1 overflow-y-auto min-h-0">
-      <div className="flex flex-col divide-y divide-border min-h-full">
+    <div className="flex-1 overflow-y-auto min-h-0 overflow-x-hidden">
+      <div className="flex flex-col divide-y divide-border min-h-full min-w-0">
         {collections.map((collection) => (
-          <div key={collection.id} className="p-2">
+          <div key={collection.id} className="p-2 min-w-0">
             <CollectionFolder collection={collection} />
           </div>
         ))}

@@ -46,7 +46,7 @@ export const CollectionTab = () => {
 
   return (
     <>
-      <div className="h-full flex flex-col overflow-hidden">
+      <div className="h-full flex flex-col overflow-hidden max-w-full">
         {/*  Header Component */}
         <CollectionTabHeader workspaceName={workspaceName} />
 
