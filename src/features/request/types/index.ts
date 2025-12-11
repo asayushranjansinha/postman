@@ -9,7 +9,7 @@ export interface CreateRequestInput {
 }
 
 export interface UpdateRequestInput {
-  id:string;
+  id: string;
   name: string;
   url: string;
   method: HttpMethod;
@@ -39,29 +39,31 @@ export interface PrismaRequestDetails extends PrismaRequest {
     key: string;
     value: string;
   }[];
-} 
-
-/**
- * Defines the structure of the data representing a single request execution
- * (The HTTP Response data), based on the Prisma RequestRun model.
- * * This is the structure contained within the 'data' field of the successful
- * ServerActionResponse from executeFakeRequest.
- */
-export interface FakeRequestRun {
-  /** A unique ID for this specific run instance. */
-  id: string;
-  /** The ID of the request definition that was executed. */
-  requestId: string;
-  /** The time the run finished. */
-  executedAt: Date;
-  /** The HTTP status code (200, 404, etc.) or null for network errors. */
-  status: number | null;
-  /** The raw body content received in the response. */
-  body: string | null;
-  /** The time taken for the request in milliseconds. */
-  durationMs: number | null;
-  /** System error message if connection failed, otherwise null. */
-  error: string | null;
-  /** Key/value pairs for the response headers. */
-  headers: { key: string; value: string }[];
 }
+
+
+
+// This matches the RequestRun model, plus its related ResponseHeader[]
+export type PrismaRequestRun = {
+  id: string;
+  requestId: string;
+  executedAt: Date;
+  status: number | null;
+  body: string | null;
+  durationMs: number | null;
+  error: string | null;
+  headers: {
+    id: string;
+    key: string;
+    value: string;
+  }[];
+};
+
+// Represents the full data needed to execute an HTTP request
+export type ExecutionDetails = {
+  url: string;
+  method: HttpMethod;
+  body: string | null;
+  headers: { key: string; value: string }[];
+  queryParams: { key: string; value: string }[];
+};

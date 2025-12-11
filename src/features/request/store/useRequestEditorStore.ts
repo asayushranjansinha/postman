@@ -1,13 +1,12 @@
-import { create } from "zustand";
 import {
-  FakeRequestRun,
-  PrismaRequest,
   PrismaRequestDetails,
+  PrismaRequestRun
 } from "@/features/request/types";
+import { create } from "zustand";
 
 export interface ExtendedTabData extends PrismaRequestDetails {
   /** Stores the result of the last executed request run. */
-  lastRun: FakeRequestRun | null;
+  lastRun: PrismaRequestRun | null;
 }
 
 type TabData = ExtendedTabData;

@@ -2,7 +2,8 @@
 
 import { RequestRunResponseViewer } from "@/features/request/components/response-viewer";
 import { useActiveRequestSync } from "@/features/request/hooks/useActiveRequestSync";
-import { useExecuteFakeRequestMutation } from "@/features/request/mutations";
+import { useRunRequestMutation } from "@/features/request/mutations"; 
+
 import { useRequestEditorStore } from "@/features/request/store/useRequestEditorStore";
 import { RequestEditorContent } from "./RequestEditorContent";
 import { RequestTabsHeader } from "./RequestTabsHeader";
@@ -12,17 +13,8 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { PrismaRequestRun } from "../../types";
 
-interface FakeRequestRun {
-  id: string;
-  requestId: string;
-  executedAt: Date;
-  status: number | null;
-  body: string | null;
-  durationMs: number | null;
-  error: string | null;
-  headers: { key: string; value: string }[];
-}
 
 export const RequestPlayground = () => {
   useActiveRequestSync();
@@ -30,7 +22,8 @@ export const RequestPlayground = () => {
   const { openTabIds, activeRequestId } = useRequestEditorStore();
   const hasOpenTabs = openTabIds.length > 0;
 
-  const executeMutation = useExecuteFakeRequestMutation();
+  const executeMutation = useRunRequestMutation();
+  
   const isLoading = executeMutation.isPending;
 
   const { setTabData: updateStoreTabData } = useRequestEditorStore();
@@ -46,26 +39,44 @@ export const RequestPlayground = () => {
     executeMutation.mutate(activeRequestId, {
       onSuccess: (response) => {
         if (response.success && response.data) {
+          // The response.data is the real PrismaRequestRun, update the store.
+          // This path handles successful server action AND successful/failed external HTTP calls (2xx, 4xx, 5xx).
           updateStoreTabData(activeRequestId, {
             lastRun: response.data,
           });
         } else {
+          // This path handles failed server actions (e.g., Auth error, Network error that was thrown)
           updateStoreTabData(activeRequestId, {
+            // Cast the error object to the expected run structure for display
             lastRun: {
               id: `error_run_${Date.now()}`,
               requestId: activeRequestId,
               executedAt: new Date(),
-              status: 0,
+              status: 0, 
               body: null,
               durationMs: 0,
+              // The message contains the error reason (e.g., "External Request Failed: ECONNREFUSED...")
               error: `Server Action Error: ${response.message}`,
               headers: [],
-            } as FakeRequestRun,
+            } as PrismaRequestRun,
           });
         }
       },
       onError: (error) => {
+        // Handle client mutation error (e.g., network error before hitting the server action)
         console.error("[UI - Playground] Client mutation error:", error);
+        updateStoreTabData(activeRequestId, {
+          lastRun: {
+            id: `client_error_${Date.now()}`,
+            requestId: activeRequestId,
+            executedAt: new Date(),
+            status: 0,
+            body: null,
+            durationMs: 0,
+            error: `Client/Network Error: ${error.message}`,
+            headers: [],
+          } as PrismaRequestRun,
+        });
       },
     });
   };

@@ -1,12 +1,14 @@
+"use client";
+
 import React, { useState } from "react";
 
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FakeRequestRun } from "../../types";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PrismaRequestRun } from "../../types";
 import { getStatusColor, getStatusText } from "../../utils";
 
 interface RequestRunResponseViewerProps {
-  runData: FakeRequestRun | null;
+  runData: PrismaRequestRun | null;
   isLoading: boolean;
 }
 
@@ -31,7 +33,7 @@ const BodyViewer: React.FC<{ body: string | null }> = ({ body }) => {
   );
 };
 
-const HeadersViewer: React.FC<{ headers: FakeRequestRun["headers"] }> = ({
+const HeadersViewer: React.FC<{ headers: PrismaRequestRun["headers"] }> = ({
   headers,
 }) => (
   <ScrollArea className="h-full">
@@ -67,11 +69,9 @@ const HeadersViewer: React.FC<{ headers: FakeRequestRun["headers"] }> = ({
   </ScrollArea>
 );
 
-// MODIFICATION: Removed red background/text styling from the wrapper div
 const ErrorViewer: React.FC<{ error: string }> = ({ error }) => (
   <ScrollArea className="h-full">
     <div className="p-4">
-      {/* Removed bg-red-500/10 text-red-600 rounded-lg */}
       <div className="overflow-auto border dark:border-gray-700 rounded-md">
         <h3 className="font-bold mb-2 p-4 border-b dark:border-gray-700">
           System/Network Error
@@ -137,10 +137,10 @@ export const RequestRunResponseViewer: React.FC<
     );
   }
 
-  const successColorClass =
-    "text-green-500 bg-green-500/10 border-green-500/30";
+  const networkErrorColorClass = "text-red-500 bg-red-500/10 border-red-500/30";
+
   const statusClass = runData.error
-    ? successColorClass
+    ? networkErrorColorClass
     : getStatusColor(runData.status, runData.error);
 
   const statusText = getStatusText(runData.status, runData.error);
@@ -152,7 +152,7 @@ export const RequestRunResponseViewer: React.FC<
       >
         <div className="flex items-center space-x-4">
           <span className="text-xl font-extrabold">{statusText}</span>
-          {/* Status badge is omitted for errors as they don't have an HTTP status code */}
+          {/* Status badge is omitted for network errors as they don't have an HTTP status code */}
           {runData.status && (
             <span
               className={`text-sm rounded-full px-2 py-0.5 border ${statusClass} border-opacity-30`}

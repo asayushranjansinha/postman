@@ -4,12 +4,13 @@ import { HttpMethod } from "@prisma/client";
 import {
   createRequest,
   deleteRequest,
-  executeFakeRequest,
+  runRequest,
   updateRequest,
   updateRequestBody,
   upsertRequestHeaders,
   upsertRequestQueryParams,
 } from "../server/action";
+import { PrismaRequestRun } from "../types";
 
 /**
  * Hook to create a new request
@@ -157,32 +158,44 @@ export const useUpdateRequestQueryParamsMutation = (requestId: string) => {
   });
 };
 
+
 /**
- * Hook to simulate the execution of a request and receive a fake response.
- * This is used for developing and testing the UI for request/response handling.
- * * @returns data - A simulated RequestRun object (FakeRequestRun)
+ * Hook to execute a request, save the run history, and receive the response data.
+ * This should be used for actual API execution.
+ *
+ * @returns data - The created RequestRun object (PrismaRequestRun)
  */
-export const useExecuteFakeRequestMutation = () => {
-  // Since this action doesn't modify cached data (it's fake and temporary),
-  // we don't necessarily need to invalidate queries like 'requests' or 'request details'.
-  // However, if the real 'executeRequest' action saved the run history, you would
-  // invalidate a 'requestRuns' query here.
+export const useRunRequestMutation = () => {
+  const queryClient = useQueryClient();
 
   return useMutation({
     // The mutationFn accepts the requestId (string)
-    mutationFn: (requestId: string) => executeFakeRequest(requestId),
+    mutationFn: (requestId: string) => runRequest(requestId),
 
-    // You handle the success/error state in the calling component to update
-    // the UI with the received runData (the fake response).
     onSuccess(response) {
-      if (response.success) {
+      if (response.success && response.data) {
+        const run: PrismaRequestRun = response.data;
+        const requestId = run.requestId;
+
+        // 1. Invalidate the query key for the request's run history.
+        // Assuming you have a query to fetch all runs for a specific request.
+        queryClient.invalidateQueries({
+          queryKey: ["requestRuns", requestId],
+        });
+
+        // 2. Potentially invalidate the request details key if you display
+        // the last run status or metadata there (though typically run history
+        // is separate).
+        queryClient.invalidateQueries({
+          queryKey: ["requests", requestId],
+        });
+
         console.log(
-          "Fake Request executed successfully, data received:",
-          response.data
+          `Request executed successfully. Run ID: ${run.id}, Status: ${run.status}`
         );
       } else {
         console.error(
-          "Fake Request execution failed (Server Action Error):",
+          "Request execution failed (Server Action Error):",
           response.message
         );
       }

@@ -1,5 +1,7 @@
 "use server";
 
+import axios, { AxiosError } from "axios";
+
 import { checkWorkspaceAccess } from "@/features/collection/lib/checkWorkspaceAccess";
 import { handleServerError } from "@/lib/handleServerError";
 import { prisma } from "@/lib/prisma";
@@ -7,9 +9,10 @@ import { ServerActionResponse } from "@/types/server";
 import { getAuth } from "@/utils/server";
 import {
   CreateRequestInput,
-  FakeRequestRun,
+  ExecutionDetails,
   PrismaRequest,
   PrismaRequestDetails,
+  PrismaRequestRun,
   UpdateRequestInput,
 } from "../types";
 
@@ -436,79 +439,186 @@ export async function upsertRequestQueryParams(
 }
 
 /**
- * Simulates executing a request and returns a fake success or failure response.
- *
- * @param requestId The ID of the request to simulate executing.
- * @returns ServerActionResponse containing a FakeRequestRun object.
+ * Executes a Request, stores the run, and returns the result.
+ * @param requestId The ID of the request to run
+ * @returns The created RequestRun object
  */
-export async function executeFakeRequest(
+export async function runRequest(
   requestId: string
-): Promise<ServerActionResponse<FakeRequestRun | null>> {
+): Promise<ServerActionResponse<PrismaRequestRun | null>> {
   try {
-    console.debug("[executeFakeRequest]: Simulating request execution", {
+    console.debug("[runRequest]: Starting execution for request", {
       requestId,
     });
+    const executedAt = new Date();
 
-    // Check Authentication
-    const data = await getAuth();
-    if (!data?.user) {
-      console.debug("[executeFakeRequest]: Unauthorized");
+    // 1 & 2. Authentication and Access Checks (omitted for brevity, remain the same)
+    const authData = await getAuth();
+    if (!authData?.user) {
+      console.debug("[runRequest]: Unauthorized");
       throw new Error("Unauthorized");
     }
+    await verifyRequestAccess(authData.user.id, requestId);
 
-    // Access Check (Optimistic Bottom-Up)
-    // Ensures the user has permission to 'execute' this request
-    await verifyRequestAccess(data.user.id, requestId);
+    const requestDetails = await prisma.request.findUnique({
+      where: { id: requestId },
+      select: {
+        method: true,
+        url: true,
+        body: true,
+        headers: { select: { key: true, value: true } },
+        queryParams: { select: { key: true, value: true } },
+      },
+    });
 
-    // 50/50 chance of success or failure
-    const isSuccess = Math.random() < 0.5;
-
-    let runData: FakeRequestRun;
-
-    if (isSuccess) {
-      // SUCCESS RESPONSE (HTTP 200 OK)
-      runData = {
-        id: `fake_run_${Date.now()}`,
-        requestId: requestId,
-        executedAt: new Date(),
-        status: 200,
-        body: '{"status": "success", "message": "Data retrieved successfully.", "count": 10}',
-        durationMs: Math.floor(Math.random() * 500) + 100, // 100ms - 600ms
-        error: null,
-        headers: [
-          { key: "Content-Type", value: "application/json" },
-          { key: "X-RateLimit-Remaining", value: "99" },
-        ],
-      };
-      console.debug("[executeFakeRequest]: Simulated success", {
-        status: runData.status,
-      });
-    } else {
-      // FAILURE RESPONSE (Simulating a Network Error/Timeout)
-      runData = {
-        id: `fake_run_${Date.now()}`,
-        requestId: requestId,
-        executedAt: new Date(),
-        status: null, // No HTTP status received
-        body: null,
-        durationMs: 3000, // Long duration simulating timeout
-        error:
-          "ECONNREFUSED: Connection refused at 127.0.0.1:8080. Check host address and port.",
-        headers: [], // No response headers received
-      };
-      console.debug("[executeFakeRequest]: Simulated failure", {
-        error: runData.error,
-      });
+    if (!requestDetails) {
+      console.debug("[runRequest]: Request not found during fetch");
+      throw new Error("Request not found");
     }
+
+    const executionDetails: ExecutionDetails = {
+      url: requestDetails.url,
+      method: requestDetails.method,
+      body: requestDetails.body,
+      headers: requestDetails.headers,
+      queryParams: requestDetails.queryParams,
+    };
+
+    // 3. Execute the actual HTTP Request
+    const runResult = await executeHttpRequest(executionDetails);
+
+    // --- [START] FIX: Explicitly fail the Server Action on External Request Error ---
+    if (runResult.error) {
+      // Log the failure, but then throw an error to trigger the outer handleServerError
+      console.warn(
+        "[runRequest]: External request failed, rejecting server action.",
+        { error: runResult.error }
+      );
+      // The message here will be wrapped by handleServerError
+      throw new Error(`External Request Failed: ${runResult.error}`);
+    }
+    // --- [END] FIX: Explicitly fail the Server Action on External Request Error ---
+
+    // 4. Create RequestRun and ResponseHeaders in an INTERACTIVE TRANSACTION (Unchanged from last fix)
+    const fullRequestRun = await prisma.$transaction(async (tx) => {
+      // 4a. Create the RequestRun record FIRST to get its ID
+      const requestRun = await tx.requestRun.create({
+        data: {
+          requestId: requestId,
+          executedAt: executedAt,
+          status: runResult.status,
+          body: runResult.body,
+          durationMs: runResult.durationMs,
+          error: runResult.error, // Will be null if we passed the check above
+        },
+      });
+
+      // 4b. Use the ID from the created RequestRun to create the ResponseHeaders
+      if (runResult.responseHeaders.length > 0) {
+        await tx.responseHeader.createMany({
+          data: runResult.responseHeaders.map((h) => ({
+            key: h.key,
+            value: h.value,
+            runId: requestRun.id,
+          })),
+        });
+      }
+
+      // 4c. Re-fetch the run (including headers) to return the complete object
+      const finalRun = await tx.requestRun.findUnique({
+        where: { id: requestRun.id },
+        include: { headers: true },
+      });
+
+      if (!finalRun) {
+        throw new Error(
+          "Failed to retrieve the final request run after header creation."
+        );
+      }
+
+      return finalRun;
+    }); // End of interactive transaction
+
+    console.debug("[runRequest]: Request run recorded", {
+      runId: fullRequestRun.id,
+      status: fullRequestRun.status,
+    });
 
     return {
       success: true,
-      data: runData,
-      message: `Request simulation complete. Status: ${
-        runData.status || "Network Error"
-      }`,
+      data: fullRequestRun as PrismaRequestRun,
+      message: "Request executed and run recorded.",
     };
   } catch (error) {
-    return handleServerError(error, "executeFakeRequest");
+    // This catches both authentication errors, Prisma errors, and the new error
+    // thrown when the external request fails due to a network error.
+    return handleServerError(error, "runRequest");
+  }
+}
+// Helper function to simulate/execute the actual HTTP call
+async function executeHttpRequest(details: ExecutionDetails): Promise<{
+  status: number | null;
+  body: string | null;
+  durationMs: number;
+  error: string | null;
+  responseHeaders: { key: string; value: string }[];
+}> {
+  const startTime = Date.now();
+  let status: number | null = null;
+  let body: string | null = null;
+  let error: string | null = null;
+  let responseHeaders: { key: string; value: string }[] = [];
+
+  try {
+    // 1. Construct the URL with query parameters
+    const url = new URL(details.url);
+    details.queryParams.forEach((p) => url.searchParams.append(p.key, p.value));
+
+    // 2. Format headers for Axios
+    const axiosHeaders = details.headers.reduce((acc, h) => {
+      acc[h.key] = h.value;
+      return acc;
+    }, {} as Record<string, string>);
+
+    // 3. Execute the request using Axios
+    const response = await axios({
+      method: details.method,
+      url: url.toString(),
+      headers: axiosHeaders,
+      data: details.body,
+      // Prevents Axios from throwing an error on non-2xx status codes,
+      // allowing us to record the actual status.
+      validateStatus: () => true,
+      // Ensure the response is treated as text/string for 'body' storage
+      responseType: "text",
+      timeout: 10000, // 10 second timeout
+    });
+
+    status = response.status;
+    body = response.data;
+
+    // Convert Axios response headers to the Prisma structure
+    responseHeaders = Object.keys(response.headers).map((key) => ({
+      key,
+      value: response.headers[key] as string,
+    }));
+  } catch (err) {
+    // Handle network errors, timeouts, etc.
+    const axiosError = err as AxiosError;
+    if (axios.isAxiosError(axiosError) && axiosError.message) {
+      error = `${axiosError.name}: ${axiosError.message}`;
+    } else {
+      error = "An unknown network error occurred.";
+    }
+    console.error("Axios Execution Error:", error);
+  } finally {
+    const durationMs = Date.now() - startTime;
+    return {
+      status,
+      body,
+      durationMs,
+      error,
+      responseHeaders,
+    };
   }
 }
