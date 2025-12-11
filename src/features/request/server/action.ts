@@ -7,10 +7,56 @@ import { ServerActionResponse } from "@/types/server";
 import { getAuth } from "@/utils/server";
 import {
   CreateRequestInput,
+  FakeRequestRun,
   PrismaRequest,
   PrismaRequestDetails,
   UpdateRequestInput,
 } from "../types";
+
+/**
+ * Verifies if the authenticated user has access to the request's workspace
+ * using a single, bottom-up database query for optimization.
+ *
+ * @param userId The ID of the authenticated user.
+ * @param requestId The ID of the request being accessed.
+ * @throws Error if the user is unauthorized, the request is not found, or access is forbidden.
+ * @returns The workspaceId if access is granted.
+ */
+async function verifyRequestAccess(
+  userId: string,
+  requestId: string
+): Promise<string> {
+  const accessCheck = await prisma.request.findUnique({
+    where: { id: requestId },
+    select: {
+      collection: {
+        select: {
+          workspaceId: true,
+        },
+      },
+    },
+  });
+
+  if (!accessCheck) {
+    console.debug("[verifyRequestAccess]: Request not found", { requestId });
+    throw new Error("Request not found");
+  }
+
+  const workspaceId = accessCheck.collection.workspaceId;
+
+  const allowed = await checkWorkspaceAccess(userId, workspaceId);
+
+  if (!allowed) {
+    console.debug("[verifyRequestAccess]: Forbidden", {
+      userId,
+      workspaceId,
+      requestId,
+    });
+    throw new Error("Forbidden");
+  }
+
+  return workspaceId;
+}
 
 /**
  * Create Request
@@ -154,7 +200,7 @@ export async function updateRequest(
       throw new Error("Unauthorized");
     }
 
-    // 2. Check Workspace Access 
+    // 2. Check Workspace Access
     const allowed = await checkWorkspaceAccess(data.user.id, workspaceId);
     if (!allowed) {
       console.debug("[updateRequest]: Forbidden");
@@ -207,36 +253,11 @@ export async function deleteRequest(
       throw new Error("Unauthorized");
     }
 
-    // 2. Fetch Request/Collection/Workspace IDs for Access Check
-    const requestDetails = await prisma.request.findUnique({
-      where: { id: requestId },
-      select: { 
-        collection: { 
-          select: { 
-            workspaceId: true 
-          } 
-        } 
-      },
-    });
+    // 2. Optimized access check
+    await verifyRequestAccess(data.user.id, requestId);
+    // Note: verifyRequestAccess handles logging for not found/forbidden.
 
-    if (!requestDetails) {
-      // If the request is not found, we can treat it as a success for idempotency, 
-      // or throw an error if strict existence is required. Throwing is safer for user feedback.
-      throw new Error("Request not found");
-    }
-    
-    const workspaceId = requestDetails.collection.workspaceId;
-
-    // 3. Check Workspace Access
-    const allowed = await checkWorkspaceAccess(data.user.id, workspaceId);
-    if (!allowed) {
-      console.debug("[deleteRequest]: Forbidden");
-      throw new Error("Forbidden");
-    }
-
-    // 4. Delete the request
-    // Prisma handles cascading deletion for related entities (like headers/params) 
-    // if your schema is configured with `onDelete: Cascade`.
+    // 3. Delete the request
     await prisma.request.delete({
       where: {
         id: requestId,
@@ -257,3 +278,237 @@ export async function deleteRequest(
   }
 }
 
+/**
+ * Get Request Details (Public)
+ * @param requestId The ID of the request
+ * @returns The request details including headers and query params (no body)
+ */
+export async function getRequestDetailsById(
+  requestId: string
+): Promise<ServerActionResponse<PrismaRequestDetails | null>> {
+  try {
+    console.debug("[getRequestDetailsById]: Fetching", { requestId });
+
+    const request = await prisma.request.findUnique({
+      where: { id: requestId },
+      include: {
+        headers: true,
+        queryParams: true,
+      },
+    });
+
+    if (!request) {
+      console.debug("[getRequestDetailsById]: Request not found");
+      throw new Error("Request not found");
+    }
+
+    return {
+      success: true,
+      data: request,
+      message: "Request details retrieved",
+    };
+  } catch (error) {
+    return handleServerError(error, "getRequestDetailsById");
+  }
+}
+
+/**
+ * Update Request Body
+ * @param requestId The ID of the request whose body to update
+ * @param body The new body content (string)
+ * @returns ServerActionResponse indicating success
+ */
+export async function updateRequestBody(
+  requestId: string,
+  body: string
+): Promise<ServerActionResponse<null>> {
+  try {
+    console.debug("[updateRequestBody]: Updating body", { requestId });
+
+    const data = await getAuth();
+    if (!data?.user) {
+      console.debug("[updateRequestBody]: Unauthorized");
+      throw new Error("Unauthorized");
+    }
+
+    // Optimized access check
+    await verifyRequestAccess(data.user.id, requestId);
+
+    await prisma.request.update({
+      where: { id: requestId },
+      data: { body },
+    });
+
+    return { success: true, data: null, message: "Body updated" };
+  } catch (error) {
+    return handleServerError(error, "updateRequestBody");
+  }
+}
+
+/**
+ * Update/Insert Request Headers
+ * Deletes all existing headers for the request and inserts the provided list.
+ * @param requestId The ID of the request
+ * @param headers An array of header key/value pairs (id is optional)
+ * @returns ServerActionResponse indicating success
+ */
+export async function upsertRequestHeaders(
+  requestId: string,
+  headers: { id?: string; key: string; value: string }[]
+): Promise<ServerActionResponse<null>> {
+  try {
+    console.debug("[upsertRequestHeaders]: Updating headers", { requestId });
+
+    // 1. Check auth
+    const data = await getAuth();
+    if (!data?.user) {
+      console.debug("[upsertRequestHeaders]: Unauthorized");
+      throw new Error("Unauthorized");
+    }
+
+    // 2. Optimized access check
+    await verifyRequestAccess(data.user.id, requestId);
+
+    // 3. Delete existing headers
+    await prisma.requestHeader.deleteMany({ where: { requestId } });
+
+    // 4. Insert new headers
+    if (headers.length > 0) {
+      await prisma.requestHeader.createMany({
+        data: headers.map((h) => ({
+          key: h.key,
+          value: h.value,
+          requestId,
+        })),
+      });
+    }
+
+    return { success: true, data: null, message: "Headers updated" };
+  } catch (error) {
+    return handleServerError(error, "upsertRequestHeaders");
+  }
+}
+
+/**
+ * Update/Insert Request Query Parameters
+ * Deletes all existing query parameters for the request and inserts the provided list.
+ * @param requestId The ID of the request
+ * @param queryParams An array of query parameter key/value pairs (id is optional)
+ * @returns ServerActionResponse indicating success
+ */
+export async function upsertRequestQueryParams(
+  requestId: string,
+  queryParams: { id?: string; key: string; value: string }[]
+): Promise<ServerActionResponse<null>> {
+  try {
+    console.debug("[upsertRequestQueryParams]: Updating query params", {
+      requestId,
+    });
+
+    // 1. Authenticate
+    const data = await getAuth();
+    if (!data?.user) {
+      console.debug("[upsertRequestQueryParams]: Unauthorized");
+      throw new Error("Unauthorized");
+    }
+
+    // 2. Optimized access check
+    await verifyRequestAccess(data.user.id, requestId);
+
+    // 3. Clear existing query params
+    await prisma.requestQueryParam.deleteMany({ where: { requestId } });
+
+    // 4. Insert new query params if any
+    if (queryParams.length > 0) {
+      await prisma.requestQueryParam.createMany({
+        data: queryParams.map((p) => ({
+          key: p.key,
+          value: p.value,
+          requestId,
+        })),
+      });
+    }
+
+    return { success: true, data: null, message: "Query params updated" };
+  } catch (error) {
+    return handleServerError(error, "upsertRequestQueryParams");
+  }
+}
+
+/**
+ * Simulates executing a request and returns a fake success or failure response.
+ *
+ * @param requestId The ID of the request to simulate executing.
+ * @returns ServerActionResponse containing a FakeRequestRun object.
+ */
+export async function executeFakeRequest(
+  requestId: string
+): Promise<ServerActionResponse<FakeRequestRun | null>> {
+  try {
+    console.debug("[executeFakeRequest]: Simulating request execution", {
+      requestId,
+    });
+
+    // Check Authentication
+    const data = await getAuth();
+    if (!data?.user) {
+      console.debug("[executeFakeRequest]: Unauthorized");
+      throw new Error("Unauthorized");
+    }
+
+    // Access Check (Optimistic Bottom-Up)
+    // Ensures the user has permission to 'execute' this request
+    await verifyRequestAccess(data.user.id, requestId);
+
+    // 50/50 chance of success or failure
+    const isSuccess = Math.random() < 0.5;
+
+    let runData: FakeRequestRun;
+
+    if (isSuccess) {
+      // SUCCESS RESPONSE (HTTP 200 OK)
+      runData = {
+        id: `fake_run_${Date.now()}`,
+        requestId: requestId,
+        executedAt: new Date(),
+        status: 200,
+        body: '{"status": "success", "message": "Data retrieved successfully.", "count": 10}',
+        durationMs: Math.floor(Math.random() * 500) + 100, // 100ms - 600ms
+        error: null,
+        headers: [
+          { key: "Content-Type", value: "application/json" },
+          { key: "X-RateLimit-Remaining", value: "99" },
+        ],
+      };
+      console.debug("[executeFakeRequest]: Simulated success", {
+        status: runData.status,
+      });
+    } else {
+      // FAILURE RESPONSE (Simulating a Network Error/Timeout)
+      runData = {
+        id: `fake_run_${Date.now()}`,
+        requestId: requestId,
+        executedAt: new Date(),
+        status: null, // No HTTP status received
+        body: null,
+        durationMs: 3000, // Long duration simulating timeout
+        error:
+          "ECONNREFUSED: Connection refused at 127.0.0.1:8080. Check host address and port.",
+        headers: [], // No response headers received
+      };
+      console.debug("[executeFakeRequest]: Simulated failure", {
+        error: runData.error,
+      });
+    }
+
+    return {
+      success: true,
+      data: runData,
+      message: `Request simulation complete. Status: ${
+        runData.status || "Network Error"
+      }`,
+    };
+  } catch (error) {
+    return handleServerError(error, "executeFakeRequest");
+  }
+}

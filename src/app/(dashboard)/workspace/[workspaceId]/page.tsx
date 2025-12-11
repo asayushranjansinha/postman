@@ -13,6 +13,7 @@ import { getCollectionsByWorkspace } from "@/features/collection/server/actions"
 import { WorkspaceDetailsClient } from "@/features/workspace/components/WorkspaceDetailsClient";
 import { getWorkspace } from "@/features/workspace/server/actions";
 import { WorkspaceSidebar } from "@/features/workspace/components/WorkspaceSidebar";
+import { RequestPlayground } from "@/features/request/components/request-playground";
 
 type PageProps = {
   params: Promise<{
@@ -43,10 +44,12 @@ export default async function WorkspaceDetailsPage({ params }: PageProps) {
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel defaultSize={65} minSize={40}>
           <div className="h-svh w-full overflow-y-scroll">
-            <div className="flex flex-col items-center h-full justify-center">
-              TODO: RequestPlayground
+            <RequestPlayground />
+
+            {/* TODO: Remove this when we have a sidebar */}
+            {/* <div className="flex flex-col items-center h-full justify-center">
               <WorkspaceDetailsClient workspaceId={workspaceId} />
-            </div>
+            </div> */}
           </div>
         </ResizablePanel>
         <ResizableHandle withHandle />

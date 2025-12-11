@@ -1,21 +1,6 @@
 import { HttpMethod } from "@prisma/client";
 
 /**
- * Returns the color class for the given HTTP status code.
- *
- * @param status The HTTP status code
- * @returns The color class for the status code
- */
-export const getStatusColor = (status?: number): string => {
-  const s = typeof status === "number" ? status : 0;
-  if (s >= 200 && s < 300) return "text-green-400";
-  if (s >= 300 && s < 400) return "text-yellow-400";
-  if (s >= 400 && s < 500) return "text-orange-400";
-  if (s >= 500) return "text-red-400";
-  return "text-gray-400";
-};
-
-/**
  * Returns the formatted size string for the given number of bytes.
  *
  * @param bytes The number of bytes
@@ -66,4 +51,61 @@ export const requestBgMap: Record<HttpMethod, string> = {
   [HttpMethod.PATCH]: "bg-purple-500/10!",
   [HttpMethod.HEAD]: "bg-gray-500/10!",
   [HttpMethod.OPTIONS]: "bg-slate-500/10!",
+};
+
+/**
+ * Determines the Tailwind CSS classes for coloring a response status banner.
+ * The classes define the text color, background color (with 10% opacity),
+ * and left border color (with 30% opacity) for visual feedback.
+ *
+ * @param status The HTTP status code (e.g., 200, 404, 500) or null if no response was received.
+ * @param error A string containing a network/system error message, or null.
+ * @returns A string containing concatenated Tailwind CSS classes.
+ */
+export const getStatusColor = (
+  status: number | null,
+  error: string | null
+): string => {
+  // Network/System Error (highest priority)
+  if (error) return "text-red-500 bg-red-500/10 border-red-500/30";
+
+  // No Status/Pending
+  if (!status) return "text-gray-500 bg-gray-500/10 border-gray-500/30";
+
+  // Success Codes (2xx)
+  if (status >= 200 && status < 300)
+    return "text-green-500 bg-green-500/10 border-green-500/30";
+
+  // Client Error Codes (4xx)
+  if (status >= 400 && status < 500)
+    return "text-yellow-600 bg-yellow-600/10 border-yellow-600/30";
+
+  // Server Error Codes (5xx)
+  if (status >= 500) return "text-red-500 bg-red-500/10 border-red-500/30";
+
+  // Default/Informational/Redirect
+  return "text-gray-500 bg-gray-500/10 border-gray-500/30";
+};
+
+/**
+ * Gets a display-friendly text string for the status code or error.
+ *
+ * @param status The HTTP status code (e.g., 200, 404, 500) or null if no response was received.
+ * @param error A string containing a network/system error message, or null.
+ * @returns A string describing the status (e.g., "200 OK", "Network Error").
+ */
+export const getStatusText = (status: number | null, error: string | null): string => {
+  // Network Error (highest priority)
+  if (error) return "Network Error";
+
+  // No Status/No Response
+  if (!status) return "No Response";
+
+  // Mapped common codes
+  if (status >= 200 && status < 300) return `${status} OK`;
+  if (status === 404) return "404 Not Found";
+  if (status === 500) return "500 Internal Server Error";
+
+  // Default status description
+  return `${status} Status`;
 };
