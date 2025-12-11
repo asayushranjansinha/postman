@@ -1,35 +1,58 @@
 "use server";
 
+import { handleServerError } from "@/lib/handleServerError";
 import { prisma } from "@/lib/prisma";
 import { ServerActionResponse } from "@/types/server";
-import { handleServerError } from "@/lib/handleServerError";
-import {
-  CreateCollectionInput,
-  RenameCollectionInput,
-  PrismaCollectionWithRequests,
-  PrismaCollectionWithWorkspaceID,
-} from "../types";
 import { getAuth } from "@/utils/server";
 import { checkWorkspaceAccess } from "../lib/checkWorkspaceAccess";
+import {
+  CreateCollectionInput,
+  PrismaCollectionWithRequests,
+  PrismaCollectionWithWorkspaceID,
+  RenameCollectionInput,
+} from "../types";
+
+// Helper to verify collection access and return workspaceId (bottom-up check)
+async function verifyCollectionAccess(
+  userId: string,
+  collectionId: string
+): Promise<string> {
+  const collectionCheck = await prisma.collection.findUnique({
+    where: { id: collectionId },
+    select: { workspaceId: true },
+  });
+
+  if (!collectionCheck) {
+    throw new Error("Collection Not Found");
+  }
+
+  const workspaceId = collectionCheck.workspaceId;
+
+  const allowed = await checkWorkspaceAccess(userId, workspaceId);
+  if (!allowed) {
+    throw new Error("Forbidden");
+  }
+
+  return workspaceId;
+}
 
 /**
  * Create Collection
+ * @param input Collection data including workspaceId
+ * @returns The created collection
  */
 export async function createCollection(
   input: CreateCollectionInput
 ): Promise<ServerActionResponse<PrismaCollectionWithWorkspaceID | null>> {
   try {
-    console.debug("[createCollection]: Creating collection");
-
     const data = await getAuth();
     if (!data || !data.user) {
-      console.debug("[createCollection] : Unauthorized");
       throw new Error("Unauthorized");
     }
 
+    // Direct check since workspaceId is available
     const allowed = await checkWorkspaceAccess(data.user.id, input.workspaceId);
     if (!allowed) {
-      console.debug("[createCollection] : Forbidden");
       throw new Error("Forbidden");
     }
 
@@ -38,10 +61,6 @@ export async function createCollection(
         name: input.name,
         workspaceId: input.workspaceId,
       },
-    });
-
-    console.debug("[createCollection]: Collection created", {
-      collectionId: collection.id,
     });
 
     return {
@@ -55,39 +74,23 @@ export async function createCollection(
 }
 
 /**
- * Update Collection
+ * Update Collection (Rename)
+ * @param id The ID of the collection to rename
+ * @param input New name
+ * @returns The updated collection
  */
 export async function renameCollection(
   id: string,
   input: RenameCollectionInput
 ): Promise<ServerActionResponse<PrismaCollectionWithWorkspaceID | null>> {
   try {
-    console.debug("[renameCollection]: Renaming collection", { id });
-
     const data = await getAuth();
     if (!data || !data.user) {
-      console.debug("[renameCollection] : Unauthorized");
       throw new Error("Unauthorized");
     }
 
-    const existing = await prisma.collection.findUnique({
-      where: { id },
-      select: { workspaceId: true },
-    });
-
-    if (!existing) {
-      console.debug("[renameCollection]: Collection Not Found");
-      throw new Error("Collection Not Found");
-    }
-
-    const allowed = await checkWorkspaceAccess(
-      data.user.id,
-      existing.workspaceId
-    );
-    if (!allowed) {
-      console.debug("[renameCollection] : Forbidden");
-      throw new Error("Forbidden");
-    }
+    // Bottom-up access check
+    await verifyCollectionAccess(data.user.id, id);
 
     const collection = await prisma.collection.update({
       where: { id },
@@ -95,8 +98,6 @@ export async function renameCollection(
         name: input.name,
       },
     });
-
-    console.debug("[renameCollection]: Collection updated", { id });
 
     return {
       success: true,
@@ -110,41 +111,22 @@ export async function renameCollection(
 
 /**
  * Delete Collection
+ * @param id The ID of the collection to delete
+ * @returns The deleted collection
  */
 export async function deleteCollection(
   id: string
 ): Promise<ServerActionResponse<PrismaCollectionWithWorkspaceID | null>> {
   try {
-    console.debug("[deleteCollection]: Deleting collection", { id });
-
     const data = await getAuth();
     if (!data || !data.user) {
-      console.debug("[deleteCollection] : Unauthorized");
       throw new Error("Unauthorized");
     }
 
-    const existing = await prisma.collection.findUnique({
-      where: { id },
-      select: { workspaceId: true },
-    });
-
-    if (!existing) {
-      console.debug("[deleteCollection]: Collection Not Found");
-      throw new Error("Collection Not Found");
-    }
-
-    const allowed = await checkWorkspaceAccess(
-      data.user.id,
-      existing.workspaceId
-    );
-    if (!allowed) {
-      console.debug("[deleteCollection] : Forbidden");
-      throw new Error("Forbidden");
-    }
+    // Bottom-up access check
+    await verifyCollectionAccess(data.user.id, id);
 
     const deleted = await prisma.collection.delete({ where: { id } });
-
-    console.debug("[deleteCollection]: Collection deleted", { id });
 
     return {
       success: true,
@@ -158,26 +140,13 @@ export async function deleteCollection(
 
 /**
  * Get Collections by Workspace
+ * @param workspaceId The ID of the workspace
+ * @returns List of collections
  */
 export async function getCollectionsByWorkspace(
   workspaceId: string
 ): Promise<ServerActionResponse<PrismaCollectionWithWorkspaceID[] | null>> {
   try {
-    console.debug("[getCollectionsByWorkspace]: Fetching collections", {
-      workspaceId,
-    });
-
-    const data = await getAuth();
-    if (!data || !data.user) {
-      console.debug("[getCollectionsByWorkspace] : Unauthorized");
-      throw new Error("Unauthorized");
-    }
-
-    const allowed = await checkWorkspaceAccess(data.user.id, workspaceId);
-    if (!allowed) {
-      console.debug("[getCollectionsByWorkspace] : Forbidden");
-      throw new Error("Forbidden");
-    }
 
     const collections = await prisma.collection.findMany({
       where: { workspaceId },
@@ -196,22 +165,13 @@ export async function getCollectionsByWorkspace(
 
 /**
  * Get Collection by ID
- * @param collectionId Collection ID
- * @returns Collection
+ * @param collectionId The ID of the collection
+ * @returns The collection including its requests
  */
 export async function getCollectionById(
   collectionId: string
 ): Promise<ServerActionResponse<PrismaCollectionWithRequests | null>> {
   try {
-    console.debug("[getCollectionById]: Fetching collection", { collectionId });
-
-    const data = await getAuth();
-
-    if (!data || !data.user) {
-      console.debug("[getCollectionById]: Unauthorized");
-      throw new Error("Unauthorized");
-    }
-
     const collection = await prisma.collection.findUnique({
       where: { id: collectionId },
       include: {
@@ -220,23 +180,8 @@ export async function getCollectionById(
     });
 
     if (!collection) {
-      console.debug("[getCollectionById]: Collection Not Found");
       throw new Error("Collection Not Found");
     }
-
-    const allowed = await checkWorkspaceAccess(
-      data.user.id,
-      collection.workspaceId
-    );
-
-    if (!allowed) {
-      console.debug("[getCollectionById]: Forbidden");
-      throw new Error("Forbidden");
-    }
-
-    console.debug("[getCollectionById]: Collection retrieved", {
-      collectionId,
-    });
 
     return {
       success: true,

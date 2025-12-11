@@ -193,7 +193,6 @@ export async function updateRequest(
     return handleServerError(error, "updateRequest");
   }
 }
-
 /**
  * Delete Request
  * @param requestId The ID of the request to delete
@@ -209,7 +208,7 @@ export async function deleteRequest(
       throw new Error("Unauthorized");
     }
 
-    // 2. Optimized access check
+    // 2. Access check
     await verifyRequestAccess(data.user.id, requestId);
 
     // 3. Delete the request
@@ -228,7 +227,6 @@ export async function deleteRequest(
     return handleServerError(error, "deleteRequest");
   }
 }
-
 /**
  * Get Request Details (Public)
  * @param requestId The ID of the request
@@ -259,7 +257,6 @@ export async function getRequestDetailsById(
     return handleServerError(error, "getRequestDetailsById");
   }
 }
-
 /**
  * Update Request Body
  * @param requestId The ID of the request whose body to update

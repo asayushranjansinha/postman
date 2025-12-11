@@ -15,7 +15,7 @@ export const useRequestSaveHotkey = () => {
   const activeTab = activeRequestId ? tabs[activeRequestId] : null;
 
   // 1. Initialize the update mutation
-  const updateMutation = useUpdateRequestMutation(activeRequestId || "");
+  const updateMutation = useUpdateRequestMutation();
   const isSaving = updateMutation.isPending;
 
   // 2. Define the save request logic
@@ -44,7 +44,7 @@ export const useRequestSaveHotkey = () => {
       method: activeTab.method,
     };
 
-    updateMutation.mutate(payload, {
+    updateMutation.mutate({ ...payload, id: activeRequestId }, {
       onSuccess: (data) => {
         if (data.success) {
           // You might also want to set the isSaved flag to true here if you implement

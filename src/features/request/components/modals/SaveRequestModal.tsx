@@ -47,7 +47,7 @@ export const SaveRequestModal = ({
   const isNewSave = activeTab.collectionId === "";
 
   // 4. Initialize mutation hooks conditionally
-  const updateMutation = useUpdateRequestMutation(activeRequestId);
+  const updateMutation = useUpdateRequestMutation();
   const createMutation = useSaveUnsavedRequestMutation();
 
   const isSubmitting = isNewSave
@@ -102,7 +102,6 @@ export const SaveRequestModal = ({
         },
       });
     } else {
-
       const updatePayload = {
         // ID is closed over in the hook
         workspaceId: workspaceId,
@@ -117,33 +116,36 @@ export const SaveRequestModal = ({
       // NOTE: Moving collections requires an extra field/mutation logic in the server action.
       // For now, we only update the store if successful.
 
-      updateMutation.mutate(updatePayload, {
-        onSuccess(response) {
-          if (!response.success || !response.data) {
-            return toast.error("Failed to update request", {
-              description: response.message,
+      updateMutation.mutate(
+        { ...updatePayload, id: activeRequestId },
+        {
+          onSuccess(response) {
+            if (!response.success || !response.data) {
+              return toast.error("Failed to update request", {
+                description: response.message,
+              });
+            }
+
+            // Update the store data
+            setTabData(activeRequestId, {
+              name: newName,
+              collectionId: newCollectionId,
+              isSaved: true,
+              // The permanent ID remains the same here
             });
-          }
 
-          // Update the store data
-          setTabData(activeRequestId, {
-            name: newName,
-            collectionId: newCollectionId,
-            isSaved: true,
-            // The permanent ID remains the same here
-          });
-
-          toast.success(`Request "${newName}" updated successfully`, {
-            description: `Details saved.`,
-          });
-          setIsModalOpen(false);
-        },
-        onError(error) {
-          toast.error("Failed to update request", {
-            description: error.message,
-          });
-        },
-      });
+            toast.success(`Request "${newName}" updated successfully`, {
+              description: `Details saved.`,
+            });
+            setIsModalOpen(false);
+          },
+          onError(error) {
+            toast.error("Failed to update request", {
+              description: error.message,
+            });
+          },
+        }
+      );
     }
   };
 

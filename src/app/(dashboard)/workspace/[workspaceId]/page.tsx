@@ -38,26 +38,27 @@ export default async function WorkspaceDetailsPage({ params }: PageProps) {
   });
 
   return (
-    // HydrationBoundary
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel defaultSize={65} minSize={40}>
-          <div className="h-svh w-full overflow-y-scroll">
-            <RequestPlayground />
-          </div>
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel
-          defaultSize={35}
-          maxSize={40}
-          minSize={25}
-          className="flex"
-        >
-          <div className="h-full w-full overflow-hidden">
-            <WorkspaceSidebar />
-          </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    </HydrationBoundary>
+    <div className="h-svh w-full overflow-y-hidden">
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <ResizablePanelGroup direction="horizontal">
+          <ResizablePanel defaultSize={65} minSize={40}>
+            <div className="h-svh w-full overflow-y-scroll">
+              <RequestPlayground />
+            </div>
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel
+            defaultSize={35}
+            maxSize={40}
+            minSize={25}
+            className="flex"
+          >
+            <div className="h-full w-full overflow-hidden">
+              <WorkspaceSidebar />
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </HydrationBoundary>
+    </div>
   );
 }
