@@ -1,4 +1,4 @@
-import { ExternalLinkIcon, HelpCircleIcon } from "lucide-react";
+import { HelpCircleIcon } from "lucide-react";
 
 import { ToolTipHint } from "@/components/shared/ToolTipHint";
 import {
@@ -33,9 +33,6 @@ export const CollectionTabHeader = ({
       <div className="flex items-center space-x-2">
         <ToolTipHint label="Help">
           <HelpCircleIcon className="size-4 text-muted-foreground hover:text-foreground cursor-pointer" />
-        </ToolTipHint>
-        <ToolTipHint label="Share">
-          <ExternalLinkIcon className="size-4 text-muted-foreground hover:text-foreground cursor-pointer" />
         </ToolTipHint>
       </div>
     </div>

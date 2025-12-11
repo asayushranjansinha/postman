@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import { PencilIcon, SaveIcon, ZapIcon } from "lucide-react";
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { RequestRunResponseViewer } from "@/features/request/components/response-viewer";
 import { useActiveRequestSync } from "@/features/request/hooks/useActiveRequestSync";
@@ -13,14 +15,13 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { useNewRequestHotkey } from "@/features/request/hooks/hotkeys/useNewRequestHotkey";
 import { useRequestSaveHotkey } from "@/features/request/hooks/hotkeys/useRequestSaveHotkey";
 import { useRequestExecution } from "@/features/request/hooks/useRequestExecution";
-import { useNewRequestHotkey } from "@/features/request/hooks/hotkeys/useNewRequestHotkey";
 
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { SaveRequestModal } from "@/features/request/components/modals/SaveRequestModal";
-// Import the UpdateRequestModal component
 import { UpdateRequestModal } from "@/features/request/components/modals/UpdateRequestModal";
-import { SaveIcon, PencilIcon } from "lucide-react";
 
 export const RequestPlayground = () => {
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
@@ -31,8 +32,9 @@ export const RequestPlayground = () => {
   useRequestSaveHotkey();
   useNewRequestHotkey();
 
-  const { openTabIds, activeRequestId, tabs } = useRequestEditorStore();
-
+  const { openTabIds, activeRequestId, tabs, newRequestTab } =
+    useRequestEditorStore();
+    
   // Safely access the active request
   const activeRequest = tabs[activeRequestId!] || {};
   const hasOpenTabs = openTabIds.length > 0;
@@ -142,12 +144,34 @@ export const RequestPlayground = () => {
           )}
         </>
       ) : (
-        <div className="flex-1 flex items-center justify-center text-muted-foreground">
-          <div className="text-center p-4">
-            <p className="text-lg mb-2">No requests open</p>
-            <p className="text-sm">
-              Select a request from the sidebar or click "Add Request" to begin.
+        <div className="flex-1 flex items-center justify-center text-center p-8">
+          <div className="flex flex-col items-center max-w-sm p-8 rounded-lg border border-dashed bg-muted/20">
+            <ZapIcon className="w-8 h-8 mb-4 text-primary" />
+
+            <h3 className="text-xl font-semibold mb-2 text-foreground">
+              Ready to create a Request?
+            </h3>
+
+            <p className="text-sm text-muted-foreground mb-6">
+              Get started by opening a saved request from the sidebar or
+              creating a new one.
             </p>
+
+            {/* Primary Action Button */}
+            <Button onClick={newRequestTab} className="mb-4 w-full">
+              <PencilIcon className="w-4 h-4 mr-2" />
+              Create New Request
+            </Button>
+
+            {/* Hotkey Hint */}
+            <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
+              <span>Quick Start:</span>
+              <KbdGroup>
+                <Kbd>Ctrl/Cmd</Kbd>
+                <Kbd>Shift</Kbd>
+                <Kbd>N</Kbd>
+              </KbdGroup>
+            </div>
           </div>
         </div>
       )}
