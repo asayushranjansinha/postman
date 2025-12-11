@@ -161,6 +161,9 @@ export async function getRequestsByCollectionId(
         headers: true,
         queryParams: true,
       },
+      orderBy: {
+        createdAt: 'desc', // Sort by creation time in descending order
+      },
     });
 
     console.debug("[getRequestsByCollectionId]: Requests retrieved", {
