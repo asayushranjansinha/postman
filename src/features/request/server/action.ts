@@ -156,14 +156,10 @@ export async function getRequestsByCollectionId(
 
 /**
  * Update Request
- * @param workspaceId The ID of the workspace (for access check)
- * @param collectionId The ID of the collection (not strictly needed for update, but kept for context)
  * @param input The request data including the request ID
  * @returns The updated request
  */
 export async function updateRequest(
-  workspaceId: string,
-  collectionId: string,
   input: UpdateRequestInput
 ): Promise<ServerActionResponse<PrismaRequest | null>> {
   try {
@@ -173,11 +169,8 @@ export async function updateRequest(
       throw new Error("Unauthorized");
     }
 
-    // 2. Check Workspace Access
-    const allowed = await checkWorkspaceAccess(data.user.id, workspaceId);
-    if (!allowed) {
-      throw new Error("Forbidden");
-    }
+    // 2. Check Request Access
+    await verifyRequestAccess(data.user.id, input.id);
 
     // 3. Update the existing request in the database
     const updatedRequest = await prisma.request.update({

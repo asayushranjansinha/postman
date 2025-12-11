@@ -343,8 +343,6 @@ export const CollectionFolder = ({ collection }: Props) => {
             name: selectedRequest.name,
             method: selectedRequest.method,
             url: selectedRequest.url,
-            collectionId: collection.id,
-            workspaceId: collection.workspaceId,
           }}
         />
       )}

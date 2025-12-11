@@ -11,8 +11,6 @@ import { useUpdateRequestMutation } from "@/features/request/mutations"; // Assu
 
 interface UpdateRequestData extends RequestFormValues {
   id: string; // The ID of the request to update
-  collectionId: string;
-  workspaceId: string;
 }
 
 interface UpdateRequestModalProps {
@@ -29,7 +27,7 @@ export const UpdateRequestModal = ({
   const { id: requestId, ...initialFormValues } = initialData;
 
   // Assume a mutation hook for updating an existing request by ID
-  const updateRequest = useUpdateRequestMutation(requestId);
+  const updateRequest = useUpdateRequestMutation();
 
   const handleUpdateRequest = (formValues: RequestFormValues) => {
     // Check if the form values are the same as the initial values
@@ -50,8 +48,7 @@ export const UpdateRequestModal = ({
 
     updateRequest.mutate(
       {
-        collectionId: initialData.collectionId,
-        workspaceId: initialData.workspaceId,
+        id: requestId,
         name: formValues.name,
         url: formValues.url!,
         method: formValues.method,

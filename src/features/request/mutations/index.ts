@@ -15,6 +15,7 @@ import {
   PrismaRequestDetails,
   PrismaRequestRun,
   SaveUnsavedRequestInput,
+  UpdateRequestInput,
 } from "../types";
 
 /**
@@ -41,29 +42,24 @@ export const useCreateRequestMutation = () => {
  * @param requestId The ID of the request to be updated
  * @returns data - PrismaRequest
  */
-export const useUpdateRequestMutation = (requestId: string) => {
+export const useUpdateRequestMutation = () => {
   const queryClient = useQueryClient();
+  
   return useMutation({
-    mutationFn: (payload: {
-      workspaceId: string;
-      collectionId: string;
-      name: string;
-      url: string;
-      method: HttpMethod;
-    }) => {
-      // Deconstruct the payload and correctly map it to the server action's arguments
-      const { workspaceId, collectionId, ...updateFields } = payload;
-
-      return updateRequest(workspaceId, collectionId, {
-        id: requestId, // Use the ID from the hook
-        ...updateFields, // name, url, method, etc.
-      });
+    mutationFn: (payload: UpdateRequestInput) => {
+      // The updated server action only takes the input object.
+      // We construct the final input object here, including the closed-over requestId.
+      return updateRequest(payload);
     },
+    
     onSuccess(data) {
       if (data.success) {
+        // Invalidate the general list of requests
         queryClient.invalidateQueries({
           queryKey: ["requests"],
         });
+        
+        // Invalidate the specific request details
         queryClient.invalidateQueries({
           queryKey: ["requests", data?.data?.id],
         });
