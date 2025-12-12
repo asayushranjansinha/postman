@@ -6,9 +6,19 @@ import Image from "next/image";
 export function CTA() {
   return (
     <section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background: Replaced bg-gradient-to-br with bg-linear-to-br (assuming definition) */}
-      <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-background to-accent/20" />
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[64px_64px]" />
+      <div className="bg-grid-effect">
+        <div className="grid-pattern" />
+
+        <div className="block dark:hidden">
+          <div className="absolute top-1/4 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-secondary/70 rounded-full blur-3xl animate-pulse-glow" />
+          <div className="absolute bottom-1/4 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-muted/70 rounded-full blur-3xl animate-pulse-glow delay-1000" />
+        </div>
+
+        <div className="dark:block hidden">
+          <div className="absolute top-1/4 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-primary/20 rounded-full blur-3xl animate-pulse-glow" />
+          <div className="absolute bottom-1/4 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-accent/20 rounded-full blur-3xl animate-pulse-glow delay-1000" />
+        </div>
+      </div>
 
       {/* Container class with inner width constraint */}
       <div className="container mx-auto">

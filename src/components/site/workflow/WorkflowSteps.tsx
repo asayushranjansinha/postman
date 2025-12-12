@@ -6,9 +6,9 @@ import { WORKFLOW_STEPS } from "@/constants/marketing";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRightIcon, Check, Zap } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { WorkflowStats } from "./WorkflowStats";
-import Link from "next/link";
 
 export function WorkflowSteps({
   autoPlayInterval = 4000,
@@ -62,8 +62,9 @@ export function WorkflowSteps({
   return (
     <section className="relative py-24 px-4 overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-linear-to-b from-background via-secondary/20 to-background" />
-      <div className="absolute inset-0 bg-[linear-linear(rgba(255,255,255,0.02)_1px,transparent_1px),linear-linear(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[64px_64px]" />
+      <div className="bg-grid-effect">
+        <div className="grid-pattern" />
+      </div>
 
       <div className="relative container px-4 mx-auto">
         {/* Header */}

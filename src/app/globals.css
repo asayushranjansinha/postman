@@ -552,3 +552,40 @@ html {
   background-size: 200% 100%;
   animation: gradient-shift 2s ease infinite;
 }
+
+/* --- Reusable Background Effects Utility --- */
+@layer components {
+  .bg-grid-effect {
+    @apply absolute inset-0 overflow-hidden pointer-events-none;
+  }
+
+  .grid-pattern {
+    @apply absolute inset-0;
+  }
+
+  .grid-pattern {
+    background-image: linear-gradient(
+        oklch(from var(--foreground) l c h / 0.03) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        oklch(from var(--foreground) l c h / 0.03) 1px,
+        transparent 1px
+      );
+    background-size: 64px 64px;
+  }
+
+  .dark .grid-pattern {
+    background-image: linear-gradient(
+        oklch(from var(--foreground) l c h / 0.03) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        oklch(from var(--foreground) l c h / 0.03) 1px,
+        transparent 1px
+      );
+    background-size: 64px 64px;
+  }
+}

@@ -9,7 +9,6 @@ import { HERO_CONTENT } from "@/constants/marketing";
 import { cn } from "@/lib/utils";
 import { JSX } from "react";
 
-// Variants for the typing effect
 const charVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
@@ -21,18 +20,23 @@ export function Hero() {
   return (
     <section className="relative pt-20 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-primary/20 rounded-full blur-3xl animate-pulse-glow" />
-        <div className="absolute bottom-1/4 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-accent/20 rounded-full blur-3xl animate-pulse-glow delay-1000" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[64px_64px]" />
+      <div className="bg-grid-effect">
+        <div className="grid-pattern" />
+
+        <div className="block dark:hidden">
+          <div className="absolute top-1/4 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-secondary/70 rounded-full blur-3xl animate-pulse-glow" />
+          <div className="absolute bottom-1/4 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-muted/70 rounded-full blur-3xl animate-pulse-glow delay-1000" />
+        </div>
+
+        <div className="dark:block hidden">
+          <div className="absolute top-1/4 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-primary/20 rounded-full blur-3xl animate-pulse-glow" />
+          <div className="absolute bottom-1/4 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-accent/20 rounded-full blur-3xl animate-pulse-glow delay-1000" />
+        </div>
       </div>
 
       <div className="container mx-auto relative max-w-7xl">
-        {/* Layout: Stacks vertically on mobile, 2 columns on lg screens */}
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* Left Column - Text */}
           <div className="max-w-2xl mx-auto lg:mx-0">
-            {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 border border-primary/20 mb-6 sm:mb-8 group hover:bg-primary/20 transition-colors cursor-pointer">
               <span className="w-2 h-2 rounded-full bg-accent animate-pulse shrink-0" />
               <span className="text-xs sm:text-sm text-muted-foreground truncate">
@@ -41,7 +45,6 @@ export function Hero() {
               <ArrowRightIcon className="w-3 h-3 sm:w-4 sm:h-4 text-primary group-hover:translate-x-1 transition-transform shrink-0" />
             </div>
 
-            {/* Headline: Responsive text sizes (4xl -> 5xl -> 6xl -> 7xl) */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground tracking-tight text-balance mb-4 sm:mb-6 leading-[1.1]">
               API testing at the{" "}
               <span className="text-transparent bg-clip-text bg-linear-to-r from-primary via-accent to-primary animate-gradient text-glow">
@@ -56,7 +59,6 @@ export function Hero() {
               wait.
             </p>
 
-            {/* CTAs: Stacks vertically on mobile, horizontal on sm screens */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-3 sm:gap-4">
               <Button
                 size="lg"
@@ -116,7 +118,6 @@ export function Hero() {
                 </div>
               </div>
 
-              {/* Code: Handles horizontal scroll on small screens with better mobile sizing */}
               <div className="p-3 sm:p-4 md:p-6 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto max-w-full scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
                 <motion.pre
                   className="text-foreground min-w-max"
@@ -215,18 +216,4 @@ function highlightSyntaxChar(char: string, line: string): JSX.Element {
   }
 
   return <span className={colorClass}>{char}</span>;
-}
-
-// Keeping the original line-based function for reference/cleaner structure, but it's not strictly used for the char-by-char effect above
-function highlightSyntax(line: string): string {
-  return line
-    .replace(/(\/\/.*)$/g, '<span class="text-muted-foreground">$1</span>')
-    .replace(/(".*?")/g, '<span class="text-accent">$1</span>')
-    .replace(
-      /\b(const|await|console|method|endpoint|headers|body)\b/g,
-      '<span class="text-primary">$1</span>'
-    )
-    .replace(/\b(log|test)\b/g, '<span class="text-chart-4">$1</span>')
-    .replace(/(\d+)/g, '<span class="text-chart-5">$1</span>')
-    .replace(/(✓)/g, '<span class="text-accent">$1</span>');
 }
