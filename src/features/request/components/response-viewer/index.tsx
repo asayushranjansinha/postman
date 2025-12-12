@@ -120,7 +120,7 @@ export const RequestRunResponseViewer: React.FC<
 
   if (!runData) {
     return (
-      <div className="flex flex-1 items-center justify-center text-muted-foreground">
+      <div className="flex flex-1 items-center justify-center text-muted-foreground px-4 sm:px-6 lg:px-8 text-center">
         <p>Click "Send" to execute the request and view the response here.</p>
       </div>
     );

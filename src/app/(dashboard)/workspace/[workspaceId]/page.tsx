@@ -3,7 +3,6 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-
 import {
   ResizableHandle,
   ResizablePanel,
@@ -12,6 +11,7 @@ import {
 import { getCollectionsByWorkspace } from "@/features/collection/server/actions";
 import { RequestPlayground } from "@/features/request/components/request-playground";
 import { WorkspaceSidebar } from "@/features/workspace/components/WorkspaceSidebar";
+import { MobileWorkspaceSheet } from "@/features/request/components/request-playground/MobileWorkspaceSheet";
 import { getWorkspace } from "@/features/workspace/server/actions";
 
 type PageProps = {
@@ -22,7 +22,6 @@ type PageProps = {
 
 export default async function WorkspaceDetailsPage({ params }: PageProps) {
   const { workspaceId } = await params;
-
   const queryClient = new QueryClient();
 
   // Prefetch the workspace data
@@ -40,24 +39,33 @@ export default async function WorkspaceDetailsPage({ params }: PageProps) {
   return (
     <div className="h-svh w-full overflow-y-hidden">
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={65} minSize={40}>
-            <div className="h-svh w-full overflow-y-scroll">
-              <RequestPlayground />
-            </div>
-          </ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel
-            defaultSize={35}
-            maxSize={40}
-            minSize={25}
-            className="flex"
-          >
-            <div className="h-full w-full overflow-hidden">
-              <WorkspaceSidebar />
-            </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+        {/* Desktop Layout - Resizable Panels */}
+        <div className="hidden md:block h-full">
+          <ResizablePanelGroup direction="horizontal">
+            <ResizablePanel defaultSize={65} minSize={40}>
+              <div className="h-svh w-full overflow-y-scroll">
+                <RequestPlayground />
+              </div>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel
+              defaultSize={35}
+              maxSize={40}
+              minSize={25}
+              className="flex"
+            >
+              <div className="h-full w-full overflow-hidden">
+                <WorkspaceSidebar />
+              </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </div>
+
+        {/* Mobile Layout - Sheet + Playground */}
+        <div className="md:hidden h-full flex flex-col">
+          <RequestPlayground />
+          <MobileWorkspaceSheet />
+        </div>
       </HydrationBoundary>
     </div>
   );
