@@ -35,7 +35,7 @@ export const OAuthButtons = () => {
         className="w-full"
         onClick={() => signInWithProvider("github")}
       >
-        <Icons.github className="mr-2 h-4 w-4 dark:invert" />
+        <Icons.github className="mr-2 h-4 w-4" />
         Sign in with GitHub
       </Button>
 

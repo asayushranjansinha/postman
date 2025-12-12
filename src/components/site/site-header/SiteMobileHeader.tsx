@@ -1,11 +1,10 @@
-// SiteMobileHeader.tsx (Refactored with Logo Component)
 "use client";
 
-import { Menu } from "lucide-react"; // Zap is no longer needed here
+import { Menu } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
-import { Logo } from "@/components/shared/Logo"; // Import the Logo component
+import { Logo } from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -14,6 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useSession } from "@/lib/auth-client";
 
 interface Props {
   navLinks: { href: string; label: string }[];
@@ -21,6 +21,8 @@ interface Props {
 
 export default function SiteMobileHeader({ navLinks }: Props) {
   const [open, setOpen] = useState(false);
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -60,28 +62,60 @@ export default function SiteMobileHeader({ navLinks }: Props) {
           ))}
         </nav>
 
-        {/* CTA Section (Added px-6 and adjusted margin/padding) */}
         <div className="flex flex-col gap-3 p-6 border-t border-border">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="justify-center w-full text-base font-semibold"
-            asChild
-          >
-            <Link href="/sign-in" onClick={() => setOpen(false)}>
-              Sign in
-            </Link>
-          </Button>
+          {isPending ? (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled
+                className="justify-center w-full text-base font-semibold"
+              >
+                Sign in
+              </Button>
 
-          <Button
-            size="sm"
-            className="bg-primary hover:bg-primary/90 glow-blue w-full text-base font-semibold"
-            asChild
-          >
-            <Link href="/sign-up" onClick={() => setOpen(false)}>
-              Start Free
-            </Link>
-          </Button>
+              <Button
+                size="sm"
+                disabled
+                className="bg-primary/50 w-full text-base font-semibold"
+              >
+                Start Free
+              </Button>
+            </>
+          ) : !user ? (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="justify-center w-full text-base font-semibold"
+                asChild
+              >
+                <Link href="/sign-in" onClick={() => setOpen(false)}>
+                  Sign in
+                </Link>
+              </Button>
+
+              <Button
+                size="sm"
+                className="bg-primary hover:bg-primary/90 glow-blue w-full text-base font-semibold"
+                asChild
+              >
+                <Link href="/sign-up" onClick={() => setOpen(false)}>
+                  Start Free
+                </Link>
+              </Button>
+            </>
+          ) : (
+            <Button
+              size="sm"
+              className="bg-primary hover:bg-primary/90 glow-blue w-full text-base font-semibold"
+              asChild
+            >
+              <Link href="/workspaces" onClick={() => setOpen(false)}>
+                Go to Workspaces
+              </Link>
+            </Button>
+          )}
         </div>
       </SheetContent>
     </Sheet>

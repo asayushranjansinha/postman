@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { ShieldIcon, ZapIcon } from "lucide-react";
+import Link from "next/link";
+import { SignUpForm } from "@/features/authentication/components/forms/SignUpForm";
 import { OAuthButtons } from "@/features/authentication/components/OAuthButtons";
-import { SignInForm } from "@/features/authentication/components/forms/SignInForm";
 
-export default function SignInPage() {
+export default function SignUpPage() {
   return (
     <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
       <div className="w-full max-w-lg">
@@ -21,20 +21,20 @@ export default function SignInPage() {
 
         <div className="text-center lg:text-left mb-8">
           <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
-            Sign in to your account
+            Create your account
           </h2>
           <p className="text-muted-foreground">
-            Don&apos;t have an account?{" "}
+            Already have an account?{" "}
             <Link
-              href="/sign-up"
+              href="/sign-in"
               className="text-primary hover:text-primary/80 font-medium transition-colors"
             >
-              Start free trial
+              Sign in
             </Link>
           </p>
         </div>
 
-        <SignInForm />
+        <SignUpForm />
 
         <div className="mt-6 mb-4">
           <div className="flex items-center">
@@ -64,7 +64,7 @@ export default function SignInPage() {
         </div>
 
         <p className="mt-8 text-center text-xs text-muted-foreground">
-          By signing in, you agree to our{" "}
+          By creating an account, you agree to our{" "}
           <Link href="/terms" className="text-primary hover:underline">
             Terms of Service
           </Link>{" "}

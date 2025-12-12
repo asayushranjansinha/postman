@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Logo } from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
 import SiteMobileHeader from "./SiteMobileHeader";
+import { useSession } from "@/lib/auth-client";
 
 const navLinks = [
   { href: "#demo", label: "Live Demo" },
@@ -16,6 +17,8 @@ const navLinks = [
 
 export default function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -33,7 +36,6 @@ export default function SiteHeader() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          
           {/* Replaced inline logo structure with the reusable Logo component */}
           <Logo size="lg" />
 
@@ -52,25 +54,40 @@ export default function SiteHeader() {
           </nav>
 
           {/* Desktop CTA */}
+          {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
-            {/* Sign In Button (asChild with Link to /sign-in) */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-muted-foreground hover:text-foreground"
-              asChild
-            >
-              <Link href="/sign-in">Sign in</Link>
-            </Button>
-            
-            {/* Start Free / Go to Workspaces Button (asChild with Link to /workspaces) */}
-            <Button
-              size="sm"
-              className="bg-primary hover:bg-primary/90 glow-blue"
-              asChild
-            >
-              <Link href="/workspaces">Go to Workspaces</Link>
-            </Button>
+            {isPending ? (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled
+                  className="text-muted-foreground"
+                >
+                  Sign in
+                </Button>
+                <Button size="sm" disabled className="bg-primary/50">
+                  Go to Workspaces
+                </Button>
+              </>
+            ) : !user ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground hover:text-foreground"
+                asChild
+              >
+                <Link href="/sign-in">Sign in</Link>
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                className="bg-primary hover:bg-primary/90 glow-blue"
+                asChild
+              >
+                <Link href="/workspaces">Go to Workspaces</Link>
+              </Button>
+            )}
           </div>
 
           <SiteMobileHeader navLinks={navLinks} />

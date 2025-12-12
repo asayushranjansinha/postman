@@ -3,10 +3,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRightIcon, PlayIcon } from "lucide-react"; // Using Icon variants
-import { motion } from "framer-motion"; // Use motion
+import { ArrowRightIcon, PlayIcon } from "lucide-react";
+import { motion } from "framer-motion";
 import { HERO_CONTENT } from "@/constants/marketing";
-import { cn } from "@/lib/utils"; // Assuming utility for class merging
+import { cn } from "@/lib/utils";
 import { JSX } from "react";
 
 // Variants for the typing effect
@@ -19,30 +19,30 @@ export function Hero() {
   const codeLines = HERO_CONTENT.codeSnippet.split("\n");
 
   return (
-    <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <section className="relative pt-20 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse-glow" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse-glow delay-1000" />
+        <div className="absolute top-1/4 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-primary/20 rounded-full blur-3xl animate-pulse-glow" />
+        <div className="absolute bottom-1/4 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-accent/20 rounded-full blur-3xl animate-pulse-glow delay-1000" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[64px_64px]" />
       </div>
 
-      {/* Replaced max-w-7xl mx-auto with container mx-auto */}
-      <div className="container mx-auto relative">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="container mx-auto relative max-w-7xl">
+        {/* Layout: Stacks vertically on mobile, 2 columns on lg screens */}
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left Column - Text */}
-          <div className="max-w-2xl">
+          <div className="max-w-2xl mx-auto lg:mx-0">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8 group hover:bg-primary/20 transition-colors cursor-pointer">
-              <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-              <span className="text-sm text-muted-foreground">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 border border-primary/20 mb-6 sm:mb-8 group hover:bg-primary/20 transition-colors cursor-pointer">
+              <span className="w-2 h-2 rounded-full bg-accent animate-pulse shrink-0" />
+              <span className="text-xs sm:text-sm text-muted-foreground truncate">
                 v3.0 Released — 10x faster test execution
               </span>
-              <ArrowRightIcon className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
+              <ArrowRightIcon className="w-3 h-3 sm:w-4 sm:h-4 text-primary group-hover:translate-x-1 transition-transform shrink-0" />
             </div>
 
-            {/* Headline */}
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground tracking-tight text-balance mb-6 leading-[1.1]">
+            {/* Headline: Responsive text sizes (4xl -> 5xl -> 6xl -> 7xl) */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground tracking-tight text-balance mb-4 sm:mb-6 leading-[1.1]">
               API testing at the{" "}
               <span className="text-transparent bg-clip-text bg-linear-to-r from-primary via-accent to-primary animate-gradient text-glow">
                 speed of thought
@@ -50,17 +50,17 @@ export function Hero() {
             </h1>
 
             {/* Subheadline */}
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-xl mb-10 text-pretty leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl mb-8 sm:mb-10 text-pretty leading-relaxed">
               The next-generation API platform that makes testing, debugging,
               and monitoring feel instant. Built for developers who refuse to
               wait.
             </p>
 
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-start gap-4">
+            {/* CTAs: Stacks vertically on mobile, horizontal on sm screens */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-3 sm:gap-4">
               <Button
                 size="lg"
-                className="w-full sm:w-auto gap-2 bg-primary hover:bg-primary/90 glow-blue text-base px-8"
+                className="w-full sm:w-auto gap-2 bg-primary hover:bg-primary/90 glow-blue text-sm sm:text-base px-6 sm:px-8"
               >
                 Start Building Free
                 <ArrowRightIcon className="w-4 h-4" />
@@ -68,7 +68,7 @@ export function Hero() {
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full sm:w-auto bg-transparent border-border hover:bg-secondary gap-2 text-base"
+                className="w-full sm:w-auto bg-transparent border-border hover:bg-secondary gap-2 text-sm sm:text-base"
               >
                 <PlayIcon className="w-4 h-4" />
                 Watch Demo
@@ -76,15 +76,15 @@ export function Hero() {
             </div>
 
             {/* Trust Indicators */}
-            <div className="mt-12 pt-8 border-t border-border">
-              <p className="text-sm text-muted-foreground mb-4">
+            <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-border">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
                 Trusted by engineering teams at
               </p>
-              <div className="flex flex-wrap items-center gap-8 opacity-60">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-8 opacity-60">
                 {HERO_CONTENT.trustedCompanies.map((company) => (
                   <span
                     key={company}
-                    className="text-foreground font-semibold tracking-tight"
+                    className="text-sm sm:text-base text-foreground font-semibold tracking-tight"
                   >
                     {company}
                   </span>
@@ -94,40 +94,40 @@ export function Hero() {
           </div>
 
           {/* Right Column - Code Editor */}
-          <div className="relative">
-            <div className="absolute -inset-4 bg-linear-to-r from-primary/20 to-accent/20 rounded-2xl blur-2xl opacity-50" />
-            <div className="relative rounded-xl border border-border overflow-hidden bg-card shadow-2xl glow-blue">
+          <div className="relative w-full">
+            <div className="absolute -inset-2 sm:-inset-4 bg-linear-to-r from-primary/20 to-accent/20 rounded-2xl blur-2xl opacity-50" />
+            <div className="relative rounded-lg sm:rounded-xl border border-border overflow-hidden bg-card shadow-2xl glow-blue">
               {/* Editor Header */}
-              <div className="flex items-center justify-between px-4 py-3 bg-secondary/50 border-b border-border">
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                    <div className="w-3 h-3 rounded-full bg-green-500/80" />
+              <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 bg-secondary/50 border-b border-border">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="flex gap-1 sm:gap-1.5 shrink-0">
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500/80" />
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500/80" />
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500/80" />
                   </div>
-                  <span className="text-xs text-muted-foreground ml-2 font-mono">
+                  <span className="text-[10px] sm:text-xs text-muted-foreground ml-1 sm:ml-2 font-mono truncate">
                     test-api.ts
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-accent font-medium">
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-[10px] sm:text-xs text-accent font-medium">
                     ● Live
                   </span>
                 </div>
               </div>
 
-              {/* TODO: replace with actual image of app and not code */}
-              <div className="p-6 font-mono text-sm leading-relaxed overflow-x-auto">
+              {/* Code: Handles horizontal scroll on small screens with better mobile sizing */}
+              <div className="p-3 sm:p-4 md:p-6 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto max-w-full scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
                 <motion.pre
-                  className="text-foreground"
+                  className="text-foreground min-w-max"
                   initial="hidden"
                   animate="visible"
                   transition={{ staggerChildren: 0.01, delay: 0.3 }}
                 >
-                  <code>
+                  <code className="whitespace-pre block">
                     {codeLines.map((line, i) => (
                       <div key={i} className="flex">
-                        <span className="text-muted-foreground/50 select-none w-8 text-right mr-4">
+                        <span className="text-muted-foreground/50 select-none w-6 sm:w-8 text-right mr-2 sm:mr-4 shrink-0">
                           {i + 1}
                         </span>
                         {/* Map over characters for typing effect */}
@@ -140,13 +140,15 @@ export function Hero() {
                             },
                           }}
                           className={cn(
-                            line.includes("//") && "text-muted-foreground"
+                            line.includes("//") && "text-muted-foreground",
+                            "inline-block"
                           )}
                         >
                           {line.split("").map((char, charIndex) => (
                             <motion.span
                               key={charIndex}
                               variants={charVariants}
+                              className="inline-block"
                             >
                               {char === " "
                                 ? "\u00a0"
@@ -157,7 +159,7 @@ export function Hero() {
                       </div>
                     ))}
                     <motion.span
-                      className="inline-block w-2 h-5 bg-primary ml-1"
+                      className="inline-block w-1.5 sm:w-2 h-4 sm:h-5 bg-primary ml-1"
                       animate={{ opacity: [0, 1, 0] }}
                       transition={{ repeat: Infinity, duration: 0.8 }}
                     />
@@ -166,16 +168,16 @@ export function Hero() {
               </div>
 
               {/* Status Bar */}
-              <div className="px-4 py-2 bg-secondary/30 border-t border-border flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <span className="text-xs text-accent">
+              <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-secondary/30 border-t border-border flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+                  <span className="text-[10px] sm:text-xs text-accent whitespace-nowrap">
                     ✓ All tests passing
                   </span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">
                     Response: 23ms
                   </span>
                 </div>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-[10px] sm:text-xs text-muted-foreground shrink-0">
                   TypeScript
                 </span>
               </div>
