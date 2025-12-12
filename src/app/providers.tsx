@@ -44,7 +44,7 @@ export const RootProviders = ({ children, ...props }: RootProvidersProps) => {
     <HotkeysProvider {...props}>
       <ThemeProvider
         attribute="class"
-        defaultTheme="dark"
+        defaultTheme="system"
         enableSystem
         disableTransitionOnChange
       >
