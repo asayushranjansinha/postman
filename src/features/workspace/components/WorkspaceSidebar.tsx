@@ -1,3 +1,4 @@
+// src/components/WorkspaceSidebar.tsx (or wherever it lives)
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -7,11 +8,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { CollectionTab } from "@/features/collection/components/collection-tab";
+// Import the new ProfileTab
+import { ProfileTab } from "@/features/collection/components/profile-tab"; 
 import {
   ArchiveIcon,
   ClockIcon,
   Share2Icon,
-  CodeIcon,
+  UserIcon, // Changed from CodeIcon to UserIcon
   LucideIcon,
 } from "lucide-react";
 
@@ -27,7 +30,8 @@ const sidebarTabItems: SidebarTabItem[] = [
   { icon: ArchiveIcon, label: "Collections", component: <CollectionTab /> },
   { icon: ClockIcon, label: "History", badgeContent: 5 }, // Placeholder value
   { icon: Share2Icon, label: "Share" },
-  { icon: CodeIcon, label: "CodeIcon" },
+  // New Profile Tab replacing the old "CodeIcon" entry
+  { icon: UserIcon, label: "Profile", component: <ProfileTab /> }, 
 ];
 
 export function WorkspaceSidebar() {
@@ -51,7 +55,7 @@ export function WorkspaceSidebar() {
             <TooltipProvider delayDuration={0} key={tabValue}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  {/* The span wrapper is necessary because TooltipTrigger with asChild cannot directly wrap a disabled element (if TabsTrigger were disabled) */}
+                  {/* The span wrapper is necessary because TooltipTrigger with asChild cannot directly wrap a disabled element */}
                   <span>
                     <TabsTrigger value={tabValue} className="group py-3">
                       <span className="relative">
