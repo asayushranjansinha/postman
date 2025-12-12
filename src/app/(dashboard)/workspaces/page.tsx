@@ -4,7 +4,6 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 
-import { CreateWorkspaceButton } from "@/features/workspace/components/CreateWorkspaceButton";
 import { listWorkspaces } from "@/features/workspace/server/actions";
 import { WorkspaceListClient } from "@/features/workspace/components/WorkspaceListClient";
 
@@ -19,13 +18,7 @@ async function WorkspacesPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="min-h-svh flex flex-col items-center justify-center space-y-6">
-        <h1 className="text-2xl font-bold">Workspaces</h1>
-        <div className="flex items-center justify-center">
-          <CreateWorkspaceButton />
-        </div>
-        <WorkspaceListClient />
-      </div>
+      <WorkspaceListClient />
     </HydrationBoundary>
   );
 }
