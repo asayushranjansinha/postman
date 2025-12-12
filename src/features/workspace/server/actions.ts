@@ -91,6 +91,9 @@ export async function listWorkspaces(): Promise<
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     console.debug("[listWorkspaces]: Workspaces Listed", {
@@ -171,8 +174,8 @@ export async function getWorkspace(workspaceId: string) {
     console.debug("[getWorkspace]: Getting workspace");
 
     const workspace = await prisma.workspace.findUnique({
-       where: {
-        id:workspaceId,
+      where: {
+        id: workspaceId,
         OR: [
           { ownerId: data.user.id },
           { members: { some: { userId: data.user.id } } },
