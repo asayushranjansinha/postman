@@ -1,5 +1,3 @@
-// src/types/metadata.ts
-
 /**
  * Defines the structure for the application's global metadata and branding.
  * This structure is designed to integrate cleanly with Next.js Metadata API.
@@ -40,21 +38,3 @@ export type SiteConfig = {
   twitterHandle: string; // e.g., @your_brand
   githubRepo: string; // e.g., your-org/your-repo
 };
-
-
-type LinkItem = {
-  label: string;
-  href: string;
-};
-
-// export type SocialLinkItem = LinkItem & {
-//   icon: (props: React.SVGProps<SVGSVGElement> | { className: string }) => JSX.Element | string;
-//   ariaLabel: string;
-// };
-
-// export type FooterLinks = {
-//   product: LinkItem[];
-//   developers: LinkItem[];
-//   company: LinkItem[];
-//   legal: LinkItem[];
-// };
