@@ -10,10 +10,10 @@ export const env = createEnv({
     GOOGLE_GENERATIVE_AI_API_KEY: z.string().min(1),
   },
   client: {
-    // NEXT_PUBLIC_API_URL: z.string().min(1),
+    NEXT_PUBLIC_API_URL: z.string().min(1),
   },
   // For Next.js >= 13.4.4, you only need to destructure client variables:
   experimental__runtimeEnv: {
-    // NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
 });
