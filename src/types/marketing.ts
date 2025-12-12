@@ -41,3 +41,21 @@ export interface PricingPlan {
   cta: string;
   popular: boolean;
 }
+
+export interface HeroContent {
+  codeSnippet: string;
+  trustedCompanies: string[];
+}
+
+export interface PerformanceMetric {
+  label: string;
+  value: number;
+  unit: string;
+  target: number;
+}
+
+export interface ComparisonData {
+  name: string;
+  time: number;
+  color: string;
+}

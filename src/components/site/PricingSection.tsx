@@ -89,3 +89,5 @@ export function PricingSection() {
     </section>
   );
 }
+
+// TODO: Add purchase logic 

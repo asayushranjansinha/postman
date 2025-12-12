@@ -1,4 +1,7 @@
 import {
+  ComparisonData,
+  HeroContent,
+  PerformanceMetric,
   PricingPlan,
   ProductFeature,
   Testimonial,
@@ -208,4 +211,38 @@ export const PRICING_PLANS: PricingPlan[] = [
     cta: "Contact Sales",
     popular: false,
   },
+];
+
+export const HERO_CONTENT: HeroContent = {
+  codeSnippet: `// Test your API in milliseconds
+const response = await pulse.test({
+  method: "POST",
+  endpoint: "/api/users",
+  headers: {
+    "Authorization": "Bearer \${token}",
+    "Content-Type": "application/json"
+  },
+  body: {
+    name: "Alex Chen",
+    email: "alex@company.com"
+  }
+});
+
+// Response time: 23ms ✓
+console.log(response.status); // 201`,
+  trustedCompanies: ["Vercel", "Stripe", "Linear", "Notion", "Figma"],
+};
+
+export const PERFORMANCE_METRICS: PerformanceMetric[] = [
+  { label: "Avg Response Time", value: 23, unit: "ms", target: 23 },
+  { label: "Tests/Second", value: 50000, unit: "", target: 50000 },
+  { label: "Uptime", value: 99.99, unit: "%", target: 99.99 },
+  { label: "Edge Locations", value: 50, unit: "+", target: 50 },
+];
+
+export const PERFORMANCE_COMPARISON: ComparisonData[] = [
+  { name: "PulseAPI", time: 23, color: "bg-primary" },
+  { name: "Postman", time: 156, color: "bg-muted" },
+  { name: "Insomnia", time: 189, color: "bg-muted" },
+  { name: "Thunder Client", time: 203, color: "bg-muted" },
 ];
