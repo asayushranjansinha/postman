@@ -1,22 +1,12 @@
-// src/components/Hero.tsx
-
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { ArrowRightIcon, PlayIcon } from "lucide-react";
-import { motion } from "framer-motion";
-import { HERO_CONTENT } from "@/constants/marketing";
-import { cn } from "@/lib/utils";
-import { JSX } from "react";
 
-const charVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1 },
-};
+import { Button } from "@/components/ui/button";
+import { HERO_CONTENT } from "@/constants/marketing";
+import { SafariMockup } from "@/components/mockups/safari-mockup";
 
 export function Hero() {
-  const codeLines = HERO_CONTENT.codeSnippet.split("\n");
-
   return (
     <section className="relative pt-20 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Background Effects */}
@@ -95,125 +85,12 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Right Column - Code Editor */}
-          <div className="relative w-full">
-            <div className="absolute -inset-2 sm:-inset-4 bg-linear-to-r from-primary/20 to-accent/20 rounded-2xl blur-2xl opacity-50" />
-            <div className="relative rounded-lg sm:rounded-xl border border-border overflow-hidden bg-card shadow-2xl glow-blue">
-              {/* Editor Header */}
-              <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 bg-secondary/50 border-b border-border">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="flex gap-1 sm:gap-1.5 shrink-0">
-                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500/80" />
-                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500/80" />
-                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500/80" />
-                  </div>
-                  <span className="text-[10px] sm:text-xs text-muted-foreground ml-1 sm:ml-2 font-mono truncate">
-                    test-api.ts
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[10px] sm:text-xs text-accent font-medium">
-                    ● Live
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-3 sm:p-4 md:p-6 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto max-w-full scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-                <motion.pre
-                  className="text-foreground min-w-max"
-                  initial="hidden"
-                  animate="visible"
-                  transition={{ staggerChildren: 0.01, delay: 0.3 }}
-                >
-                  <code className="whitespace-pre block">
-                    {codeLines.map((line, i) => (
-                      <div key={i} className="flex">
-                        <span className="text-muted-foreground/50 select-none w-6 sm:w-8 text-right mr-2 sm:mr-4 shrink-0">
-                          {i + 1}
-                        </span>
-                        {/* Map over characters for typing effect */}
-                        <motion.span
-                          variants={{
-                            hidden: { opacity: 0 },
-                            visible: {
-                              opacity: 1,
-                              transition: { staggerChildren: 0.01 },
-                            },
-                          }}
-                          className={cn(
-                            line.includes("//") && "text-muted-foreground",
-                            "inline-block"
-                          )}
-                        >
-                          {line.split("").map((char, charIndex) => (
-                            <motion.span
-                              key={charIndex}
-                              variants={charVariants}
-                              className="inline-block"
-                            >
-                              {char === " "
-                                ? "\u00a0"
-                                : highlightSyntaxChar(char, line)}
-                            </motion.span>
-                          ))}
-                        </motion.span>
-                      </div>
-                    ))}
-                    <motion.span
-                      className="inline-block w-1.5 sm:w-2 h-4 sm:h-5 bg-primary ml-1"
-                      animate={{ opacity: [0, 1, 0] }}
-                      transition={{ repeat: Infinity, duration: 0.8 }}
-                    />
-                  </code>
-                </motion.pre>
-              </div>
-
-              {/* Status Bar */}
-              <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-secondary/30 border-t border-border flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-                  <span className="text-[10px] sm:text-xs text-accent whitespace-nowrap">
-                    ✓ All tests passing
-                  </span>
-                  <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">
-                    Response: 23ms
-                  </span>
-                </div>
-                <span className="text-[10px] sm:text-xs text-muted-foreground shrink-0">
-                  TypeScript
-                </span>
-              </div>
-            </div>
+          {/* Right Column - Image */}
+          <div className="relative w-full flex justify-center lg:justify-end">
+            <SafariMockup image="/sample.webp" className="w-full max-w-2xl" />
           </div>
         </div>
       </div>
     </section>
   );
-}
-
-// Updated syntax highlighting to return a colored span for each char
-function highlightSyntaxChar(char: string, line: string): JSX.Element {
-  const text = line.trim();
-  let colorClass = "text-foreground";
-
-  // Simple keyword/number/string detection for individual characters
-  if (text.startsWith("//")) {
-    colorClass = "text-muted-foreground";
-  } else if (
-    /\b(const|await|console|method|endpoint|headers|body)\b/.test(text)
-  ) {
-    colorClass = "text-primary";
-  } else if (/\b(log|test)\b/.test(text)) {
-    colorClass = "text-chart-4";
-  } else if (/\d+/.test(char) && /\d+/.test(text)) {
-    colorClass = "text-chart-5";
-  } else if (/"[^"]*?"/.test(text)) {
-    colorClass = "text-accent";
-  }
-
-  // Special case for successful tick mark (✓)
-  if (char === "✓") {
-    colorClass = "text-accent";
-  }
-
-  return <span className={colorClass}>{char}</span>;
 }
