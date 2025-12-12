@@ -619,3 +619,57 @@ export async function saveUnsavedRequest(
     return handleServerError(error, "saveUnsavedRequest");
   }
 }
+
+
+
+/**
+ * Executes a Public Request for immediate testing without storing details in the database.
+ * This is a public action and does not require user authentication or workspace access checks.
+ *
+ * @param executionDetails The full details needed to execute the HTTP call (URL, method, headers, etc.).
+ * @returns The resulting ExecutionDetails (status, body, duration, headers) wrapped in a ServerActionResponse.
+ */
+export async function executePublicRequest(
+  executionDetails: ExecutionDetails
+): Promise<ServerActionResponse<PrismaRequestRun | null>> {
+  const executedAt = new Date();
+
+  try {
+    // 1. Execute the actual HTTP Request using the existing helper
+    // No authentication or database lookups required here.
+    const runResult = await executeHttpRequest(executionDetails);
+
+    // 2. Check for network/Axios errors during execution
+    if (runResult.error) {
+      throw new Error(runResult.error);
+    }
+
+    // 3. Construct a temporary PrismaRequestRun object structure.
+    // NOTE: This object is NOT saved to the database, but it adheres to the
+    // existing return type for consistency with runRequest. The ID field will be null or temporary.
+    const tempRequestRun: PrismaRequestRun = {
+      id: "temp-public-run-id", // Use a temporary placeholder ID
+      requestId: "public-request", // Placeholder
+      executedAt: executedAt,
+      status: runResult.status,
+      body: runResult.body,
+      durationMs: runResult.durationMs,
+      error: runResult.error,
+      // Embed the response headers directly into the structure for the client to read
+      headers: runResult.responseHeaders.map(h => ({
+        ...h,
+        id: `temp-${Math.random().toString(36).substring(2)}`, // Generate temporary IDs for headers
+        runId: 'temp-public-run-id'
+      })),
+    };
+
+    return {
+      success: true,
+      data: tempRequestRun,
+      message: "Public request executed successfully.",
+    };
+  } catch (error) {
+    // This catches network/Axios errors and any other runtime exceptions
+    return handleServerError(error, "executePublicRequest");
+  }
+}

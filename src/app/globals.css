@@ -194,11 +194,13 @@
 }
 
 .glow-blue {
-  box-shadow: 0 0 40px oklch(0.7 0.18 250 / 0.3), 0 0 80px oklch(0.7 0.18 250 / 0.1);
+  box-shadow: 0 0 40px oklch(0.7 0.18 250 / 0.3),
+    0 0 80px oklch(0.7 0.18 250 / 0.1);
 }
 
 .glow-cyan {
-  box-shadow: 0 0 40px oklch(0.75 0.15 195 / 0.3), 0 0 80px oklch(0.75 0.15 195 / 0.1);
+  box-shadow: 0 0 40px oklch(0.75 0.15 195 / 0.3),
+    0 0 80px oklch(0.75 0.15 195 / 0.1);
 }
 
 .text-glow {
@@ -228,6 +230,325 @@ html {
   background: oklch(0.4 0.02 270);
 }
 
+/* Monaco Editor Custom Styles - Add to your globals.css */
 
-/* TODO: CHange primary forground on dark */
-/* TODO: CHange accent on dark */
+/* Container styling with OKLCH color space */
+.monaco-editor {
+  --monaco-bg: var(--background);
+  --monaco-fg: var(--foreground);
+  --monaco-border: var(--border);
+  --monaco-accent: var(--accent);
+  --monaco-muted: var(--muted);
+  --monaco-muted-fg: var(--muted-foreground);
+  --monaco-primary: var(--primary);
+  --monaco-card: var(--card);
+}
+
+/* Override Monaco's default background */
+.monaco-editor,
+.monaco-editor .margin,
+.monaco-editor-background {
+  background-color: var(--monaco-bg) !important;
+}
+
+/* Line numbers with electric blue theme */
+.monaco-editor .line-numbers {
+  color: var(--monaco-muted-fg) !important;
+  opacity: 0.5;
+  transition: all 0.2s ease;
+}
+
+.monaco-editor .line-numbers.active-line-number {
+  color: var(--monaco-primary) !important;
+  opacity: 1;
+  font-weight: 600;
+}
+
+/* Current line highlight with subtle glow */
+.monaco-editor .current-line {
+  background-color: var(--monaco-accent) !important;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    oklch(from var(--monaco-accent) l c h / 0.1) 50%,
+    transparent 100%
+  ) !important;
+  border: none !important;
+}
+
+/* Selection with primary color */
+.monaco-editor .selected-text {
+  background-color: oklch(from var(--monaco-primary) l c h / 0.15) !important;
+}
+
+.monaco-editor .focused .selected-text {
+  background-color: oklch(from var(--monaco-primary) l c h / 0.25) !important;
+}
+
+/* Cursor with neon glow effect */
+.monaco-editor .cursor {
+  background-color: var(--monaco-primary) !important;
+  box-shadow: 0 0 8px oklch(from var(--monaco-primary) l c h / 0.6);
+}
+
+/* Scrollbars matching custom scrollbar theme */
+.monaco-editor .scrollbar {
+  background-color: transparent !important;
+}
+
+.monaco-editor .slider {
+  background-color: oklch(0.3 0.02 270) !important;
+  border-radius: 4px !important;
+  transition: background-color 0.2s ease;
+}
+
+.monaco-editor .slider:hover {
+  background-color: oklch(0.4 0.02 270) !important;
+}
+
+.monaco-editor .slider.active {
+  background-color: oklch(from var(--monaco-primary) l c h / 0.6) !important;
+}
+
+/* Indent guides with subtle styling */
+.monaco-editor .indent-guide {
+  border-left: 1px solid var(--monaco-border) !important;
+  opacity: 0.2;
+}
+
+.monaco-editor .indent-guide.active {
+  border-left: 1px solid var(--monaco-primary) !important;
+  opacity: 0.5;
+}
+
+/* Bracket matching with primary color accent */
+.monaco-editor .bracket-match {
+  background-color: oklch(from var(--monaco-primary) l c h / 0.15) !important;
+  border: 1px solid oklch(from var(--monaco-primary) l c h / 0.4) !important;
+  border-radius: 2px;
+}
+
+/* Find widget with card styling */
+.monaco-editor .find-widget {
+  background-color: var(--monaco-card) !important;
+  border: 1px solid var(--monaco-border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+}
+
+/* Suggest widget (autocomplete) with electric theme */
+.monaco-editor .suggest-widget {
+  background-color: var(--monaco-card) !important;
+  border: 1px solid var(--monaco-border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  backdrop-filter: blur(8px);
+}
+
+.monaco-editor .suggest-widget .monaco-list-row {
+  border-radius: var(--radius-sm) !important;
+  transition: background-color 0.15s ease;
+}
+
+.monaco-editor .suggest-widget .monaco-list-row.focused {
+  background-color: var(--monaco-accent) !important;
+  box-shadow: inset 2px 0 0 var(--monaco-primary);
+}
+
+/* Parameter hints */
+.monaco-editor .parameter-hints-widget {
+  background-color: var(--monaco-card) !important;
+  border: 1px solid var(--monaco-border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+}
+
+/* Minimap (if enabled) */
+.monaco-editor .minimap {
+  background-color: var(--monaco-muted) !important;
+  opacity: 0.3;
+}
+
+/* Error/Warning squiggles with OKLCH colors */
+.monaco-editor .squiggly-error {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 3' enable-background='new 0 0 6 3' height='3' width='6'%3E%3Cg fill='oklch(0.577 0.245 27.325)'%3E%3Cpolygon points='5.5,0 2.5,3 1.1,3 4.1,0'/%3E%3Cpolygon points='4,0 6,2 6,0.6 5.4,0'/%3E%3Cpolygon points='0,2 1,3 2.4,3 0,0.6'/%3E%3C/g%3E%3C/svg%3E")
+    repeat-x bottom left !important;
+}
+
+.monaco-editor .squiggly-warning {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 3' enable-background='new 0 0 6 3' height='3' width='6'%3E%3Cg fill='oklch(0.828 0.189 84.429)'%3E%3Cpolygon points='5.5,0 2.5,3 1.1,3 4.1,0'/%3E%3Cpolygon points='4,0 6,2 6,0.6 5.4,0'/%3E%3Cpolygon points='0,2 1,3 2.4,3 0,0.6'/%3E%3C/g%3E%3C/svg%3E")
+    repeat-x bottom left !important;
+}
+
+.monaco-editor .squiggly-info {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 3' enable-background='new 0 0 6 3' height='3' width='6'%3E%3Cg fill='oklch(0.7 0.18 250)'%3E%3Cpolygon points='5.5,0 2.5,3 1.1,3 4.1,0'/%3E%3Cpolygon points='4,0 6,2 6,0.6 5.4,0'/%3E%3Cpolygon points='0,2 1,3 2.4,3 0,0.6'/%3E%3C/g%3E%3C/svg%3E")
+    repeat-x bottom left !important;
+}
+
+/* Hover widget with card styling */
+.monaco-editor .monaco-hover {
+  background-color: var(--monaco-card) !important;
+  border: 1px solid var(--monaco-border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+}
+
+/* Context menu */
+.monaco-menu .monaco-action-bar {
+  background-color: var(--monaco-card) !important;
+  border: 1px solid var(--monaco-border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+}
+
+.monaco-menu .monaco-action-bar .action-item {
+  border-radius: var(--radius-sm) !important;
+  transition: background-color 0.15s ease;
+}
+
+.monaco-menu .monaco-action-bar .action-item:hover {
+  background-color: var(--monaco-accent) !important;
+}
+
+/* Gutter (line number area) styling */
+.monaco-editor .margin-view-overlays {
+  background-color: transparent !important;
+}
+
+/* Active editor borders */
+.monaco-editor.focused {
+  outline: none !important;
+}
+
+/* Light theme token colors (matching your electric blue theme) */
+.monaco-editor.vs .mtk1 {
+  color: var(--monaco-fg) !important;
+}
+.monaco-editor.vs .mtk2 {
+  color: oklch(0.6 0.2 250) !important;
+} /* Keywords - primary blue */
+.monaco-editor.vs .mtk3 {
+  color: oklch(0.5 0.15 160) !important;
+} /* Strings - green */
+.monaco-editor.vs .mtk4 {
+  color: oklch(0.6 0.18 50) !important;
+} /* Numbers - orange */
+.monaco-editor.vs .mtk5 {
+  color: oklch(0.55 0.2 280) !important;
+} /* Functions - purple */
+.monaco-editor.vs .mtk8 {
+  color: oklch(0.5 0.02 270) !important;
+} /* Comments - muted */
+.monaco-editor.vs .mtk22 {
+  color: oklch(0.75 0.15 195) !important;
+} /* Properties - cyan accent */
+
+/* Dark theme token colors (electric/neon aesthetic) */
+.monaco-editor.vs-dark .mtk1 {
+  color: var(--monaco-fg) !important;
+}
+.monaco-editor.vs-dark .mtk2 {
+  color: oklch(0.7 0.18 250) !important;
+} /* Keywords - bright blue */
+.monaco-editor.vs-dark .mtk3 {
+  color: oklch(0.7 0.15 160) !important;
+} /* Strings - bright green */
+.monaco-editor.vs-dark .mtk4 {
+  color: oklch(0.75 0.18 50) !important;
+} /* Numbers - orange */
+.monaco-editor.vs-dark .mtk5 {
+  color: oklch(0.7 0.2 280) !important;
+} /* Functions - purple */
+.monaco-editor.vs-dark .mtk8 {
+  color: oklch(0.6 0 0) !important;
+} /* Comments - muted */
+.monaco-editor.vs-dark .mtk22 {
+  color: oklch(0.75 0.15 195) !important;
+} /* Properties - cyan accent */
+
+/* JSON-specific syntax highlighting */
+.monaco-editor .token.string.key.json {
+  color: var(--monaco-primary) !important;
+  font-weight: 500;
+}
+
+.monaco-editor .token.string.value.json {
+  color: oklch(0.7 0.15 160) !important;
+}
+
+.monaco-editor .token.number.json {
+  color: oklch(0.75 0.15 195) !important;
+}
+
+/* Remove focus outline */
+.monaco-editor textarea {
+  outline: none !important;
+}
+
+/* Smooth animations matching your theme */
+.monaco-editor * {
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+/* Match your card/border styling */
+.monaco-editor {
+  border-radius: 0 !important;
+}
+
+/* Ensure proper text rendering */
+.monaco-editor .view-lines {
+  font-feature-settings: "liga" 1, "calt" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Enhanced glow effects for dark mode */
+.dark .monaco-editor .cursor {
+  box-shadow: 0 0 10px oklch(0.7 0.18 250 / 0.8),
+    0 0 20px oklch(0.7 0.18 250 / 0.4);
+}
+
+.dark .monaco-editor .bracket-match {
+  box-shadow: 0 0 8px oklch(0.7 0.18 250 / 0.3);
+}
+
+/* Selection with neon glow in dark mode */
+.dark .monaco-editor.focused .selected-text {
+  background-color: oklch(from var(--monaco-primary) l c h / 0.25) !important;
+  box-shadow: 0 0 20px oklch(from var(--monaco-primary) l c h / 0.1);
+}
+
+/* Hover effects for interactive elements */
+.monaco-editor .monaco-list-row:hover {
+  background-color: oklch(from var(--monaco-accent) l c h / 0.5) !important;
+}
+
+/* Match input styling */
+.monaco-editor input,
+.monaco-editor .inputarea {
+  font-family: var(--font-mono), "JetBrains Mono", "Fira Code", monospace !important;
+}
+
+/* Matching your gradient animations for special states */
+@keyframes monaco-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.monaco-editor .monaco-progress-container {
+  background: linear-gradient(
+    90deg,
+    var(--monaco-primary),
+    var(--monaco-accent),
+    var(--monaco-primary)
+  );
+  background-size: 200% 100%;
+  animation: gradient-shift 2s ease infinite;
+}

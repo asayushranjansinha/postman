@@ -34,23 +34,36 @@ export const parseKeyValueData = (jsonString?: string) => {
 };
 
 export const requestColorMap: Record<HttpMethod, string> = {
-  [HttpMethod.GET]: "text-emerald-500!",
-  [HttpMethod.POST]: "text-blue-500!",
-  [HttpMethod.PUT]: "text-amber-500!",
-  [HttpMethod.DELETE]: "text-rose-500!",
-  [HttpMethod.PATCH]: "text-purple-500!",
-  [HttpMethod.HEAD]: "text-gray-500!",
-  [HttpMethod.OPTIONS]: "text-slate-500!",
-};
+  // Light: 500 (Default), Dark: 400 (Brighter)
+  [HttpMethod.GET]: "text-emerald-500! dark:text-emerald-400!",
 
+  [HttpMethod.POST]: "text-blue-500! dark:text-blue-400!",
+
+  [HttpMethod.PUT]: "text-amber-500! dark:text-amber-400!",
+
+  [HttpMethod.DELETE]: "text-rose-500! dark:text-rose-400!",
+
+  [HttpMethod.PATCH]: "text-purple-500! dark:text-purple-400!",
+
+  [HttpMethod.HEAD]: "text-gray-500! dark:text-gray-400!",
+
+  [HttpMethod.OPTIONS]: "text-slate-500! dark:text-slate-400!",
+};
 export const requestBgMap: Record<HttpMethod, string> = {
-  [HttpMethod.GET]: "bg-emerald-500/10!",
-  [HttpMethod.POST]: "bg-blue-500/10!",
-  [HttpMethod.PUT]: "bg-amber-500/10!",
-  [HttpMethod.DELETE]: "bg-rose-500/10!",
-  [HttpMethod.PATCH]: "bg-purple-500/10!",
-  [HttpMethod.HEAD]: "bg-gray-500/10!",
-  [HttpMethod.OPTIONS]: "bg-slate-500/10!",
+  // Light: 500 (Default), Dark: 400 (Brighter)
+  [HttpMethod.GET]: "bg-emerald-500/10! dark:bg-emerald-400/10!",
+
+  [HttpMethod.POST]: "bg-blue-500/10! dark:bg-blue-400/10!",
+
+  [HttpMethod.PUT]: "bg-amber-500/10! dark:bg-amber-400/10!",
+
+  [HttpMethod.DELETE]: "bg-rose-500/10! dark:bg-rose-400/10!",
+
+  [HttpMethod.PATCH]: "bg-purple-500/10! dark:bg-purple-400/10!",
+
+  [HttpMethod.HEAD]: "bg-gray-500/10! dark:bg-gray-400/10!",
+
+  [HttpMethod.OPTIONS]: "bg-slate-500/10! dark:bg-slate-400/10!",
 };
 
 /**
@@ -94,7 +107,10 @@ export const getStatusColor = (
  * @param error A string containing a network/system error message, or null.
  * @returns A string describing the status (e.g., "200 OK", "Network Error").
  */
-export const getStatusText = (status: number | null, error: string | null): string => {
+export const getStatusText = (
+  status: number | null,
+  error: string | null
+): string => {
   // Network Error (highest priority)
   if (error) return "Network Error";
 

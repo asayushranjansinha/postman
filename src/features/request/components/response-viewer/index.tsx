@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PrismaRequestRun } from "../../types";
+// Assuming getStatusColor and getStatusText are imported and available
 import { getStatusColor, getStatusText } from "../../utils";
+import { cn } from "@/lib/utils";
 
 interface RequestRunResponseViewerProps {
   runData: PrismaRequestRun | null;
@@ -19,16 +21,20 @@ const BodyViewer: React.FC<{ body: string | null }> = ({ body }) => {
       : body;
 
   return (
-    <ScrollArea className="flex-1 h-full p-4 bg-gray-50 dark:bg-gray-800">
-      {body === null ? (
-        <p className="text-muted-foreground text-sm">
-          No response body received.
-        </p>
-      ) : (
-        <pre className="text-xs font-mono whitespace-pre-wrap">
-          {formattedBody}
-        </pre>
-      )}
+    // STYLED: Used theme-aware bg-muted/50 for the code block background
+    <ScrollArea className="flex-1 h-full bg-muted/50">
+      <div className="p-4">
+        {body === null ? (
+          <p className="text-muted-foreground text-sm">
+            No response body received.
+          </p>
+        ) : (
+          // Fixed text color for better readability against dark backgrounds
+          <pre className="text-xs font-mono whitespace-pre-wrap text-foreground">
+            {formattedBody}
+          </pre>
+        )}
+      </div>
     </ScrollArea>
   );
 };
@@ -37,27 +43,30 @@ const HeadersViewer: React.FC<{ headers: PrismaRequestRun["headers"] }> = ({
   headers,
 }) => (
   <ScrollArea className="h-full">
-    <div className="p-4">
+    <div className="p-4 overflow-x-auto">
       {headers.length === 0 ? (
         <p className="text-muted-foreground text-sm">
           No response headers received.
         </p>
       ) : (
+        // STYLED: Use border-border and bg-card for header table styling
         <table className="w-full text-left text-xs table-auto border-collapse">
           <thead>
-            <tr className="text-muted-foreground border-b">
-              <th className="py-2 w-1/4">Key</th>
-              <th className="py-2 w-3/4">Value</th>
+            <tr className="text-muted-foreground border-b border-border">
+              <th className="py-2 w-1/4 min-w-[120px]">Key</th>
+              <th className="py-2 w-3/4 min-w-[200px]">Value</th>
             </tr>
           </thead>
           <tbody>
             {headers.map((h, index) => (
               <tr
                 key={index}
-                className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                className="border-b border-border/50 hover:bg-muted/50 transition-colors"
               >
-                <td className="py-2 font-mono truncate">{h.key}</td>
-                <td className="py-2 font-mono text-muted-foreground truncate">
+                <td className="py-2 font-mono text-foreground break-all">
+                  {h.key}
+                </td>
+                <td className="py-2 font-mono text-muted-foreground break-all">
                   {h.value}
                 </td>
               </tr>
@@ -72,13 +81,9 @@ const HeadersViewer: React.FC<{ headers: PrismaRequestRun["headers"] }> = ({
 const ErrorViewer: React.FC<{ error: string }> = ({ error }) => (
   <ScrollArea className="h-full">
     <div className="p-4">
-      <div className="overflow-auto border dark:border-gray-700 rounded-md">
-        <h3 className="font-bold mb-2 p-4 border-b dark:border-gray-700">
-          System/Network Error
-        </h3>
-        <pre className="text-xs whitespace-pre-wrap p-4 text-muted-foreground">
-          {error}
-        </pre>
+      <div className="border border-destructive/50 bg-destructive/10 text-destructive-foreground rounded-md p-4">
+        <h3 className="font-bold mb-2">System/Network Error</h3>
+        <pre className="text-xs whitespace-pre-wrap">{error}</pre>
       </div>
     </div>
   </ScrollArea>
@@ -97,32 +102,16 @@ export const RequestRunResponseViewer: React.FC<
   const [activeTabKey, setActiveTabKey] =
     useState<keyof typeof tabKeys>(initialTabKey);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setActiveTabKey(runData?.error ? "error" : "body");
   }, [runData]);
 
   if (isLoading) {
     return (
       <div className="flex flex-1 items-center justify-center text-muted-foreground">
-        <div className="text-center space-y-2">
-          <svg
-            className="animate-spin h-6 w-6 mx-auto text-blue-500"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
+        <div className="text-center space-y-2 text-primary">
+          {/* STYLED: Standard shadcn/ui spinner style */}
+          <div className="animate-spin h-6 w-6 mx-auto border-4 border-primary/30 border-t-primary rounded-full" />
           <p>Sending request...</p>
         </div>
       </div>
@@ -137,25 +126,36 @@ export const RequestRunResponseViewer: React.FC<
     );
   }
 
-  const networkErrorColorClass = "text-red-500 bg-red-500/10 border-red-500/30";
-
-  const statusClass = runData.error
-    ? networkErrorColorClass
-    : getStatusColor(runData.status, runData.error);
-
+  // Use utils to determine styling for status bar
+  const statusClass = getStatusColor(runData.status, runData.error);
   const statusText = getStatusText(runData.status, runData.error);
 
+  // Custom styling for the status bar container
+  const statusHeaderClass = runData.error
+    ? "bg-destructive/20 border-destructive"
+    : cn("border-l-4", statusClass, "bg-background/80");
+
   return (
-    <div className="flex flex-col flex-1 h-full bg-white dark:bg-gray-900">
+    // STYLED: Use bg-card for the main container
+    <div className="flex flex-col flex-1 h-full bg-card">
       <div
-        className={`p-4 flex justify-between items-center border-b border-l-4 ${statusClass} border-opacity-70 font-mono`}
+        // STYLED: Simplified and centralized status bar styling
+        className={cn(
+          "p-4 flex justify-between items-center border-b border-border font-mono",
+          statusHeaderClass
+        )}
       >
         <div className="flex items-center space-x-4">
-          <span className="text-xl font-extrabold">{statusText}</span>
+          <span className="text-xl font-extrabold text-foreground">
+            {statusText}
+          </span>
           {/* Status badge is omitted for network errors as they don't have an HTTP status code */}
           {runData.status && (
             <span
-              className={`text-sm rounded-full px-2 py-0.5 border ${statusClass} border-opacity-30`}
+              className={cn(
+                "text-sm rounded-full px-2 py-0.5 border text-foreground",
+                statusClass
+              )}
             >
               HTTP {runData.status}
             </span>
@@ -171,9 +171,9 @@ export const RequestRunResponseViewer: React.FC<
         onValueChange={(value) =>
           setActiveTabKey(value as keyof typeof tabKeys)
         }
-        className="flex-1 flex flex-col h-full"
+        className="flex-1 flex flex-col h-full overflow-hidden" // ADDED: overflow-hidden to fix clipping
       >
-        <TabsList className="flex border-b h-auto p-0 bg-transparent dark:bg-transparent rounded-none justify-start">
+        <TabsList className="flex border-b border-border h-auto p-0 bg-transparent rounded-none justify-start">
           {Object.entries(tabKeys)
             .filter(([key]) => key !== "error" || runData.error)
             .map(([key, name]) => (
@@ -192,6 +192,7 @@ export const RequestRunResponseViewer: React.FC<
             ))}
         </TabsList>
 
+        {/* This div must have overflow-hidden to prevent the scroll area from causing a double scrollbar */}
         <div className="flex-1 overflow-hidden">
           <TabsContent value="body" className="h-full mt-0">
             <BodyViewer body={runData.body} />

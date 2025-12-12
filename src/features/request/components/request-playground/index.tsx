@@ -34,7 +34,7 @@ export const RequestPlayground = () => {
 
   const { openTabIds, activeRequestId, tabs, newRequestTab } =
     useRequestEditorStore();
-    
+
   // Safely access the active request
   const activeRequest = tabs[activeRequestId!] || {};
   const hasOpenTabs = openTabIds.length > 0;
@@ -64,14 +64,15 @@ export const RequestPlayground = () => {
           <ResizablePanelGroup direction="vertical" className="flex-1">
             <ResizablePanel defaultSize={65} minSize={20}>
               <div className="flex flex-col h-full overflow-y-auto border-b">
-                <header className="flex items-center justify-between p-3 border-b bg-muted/30">
-                  <h2 className="flex items-center text-lg font-semibold truncate text-muted-foreground">
-                    Editing: {activeRequest.name}
+                <header className="flex items-center justify-between p-3 border-b bg-background/50 backdrop-blur-sm sticky top-0 z-10">
+                  {/* Request Title and Unsaved Indicator */}
+                  <h2 className="flex items-center text-base font-medium truncate text-foreground">
+                    {activeRequest.name}
+
                     {/* Unsaved Indicator (Small Dot) */}
                     {isUnsaved && (
                       <span
-                        className="ml-2 h-2 w-2 rounded-full bg-yellow-500 
-                        shadow-md ring-1 ring-yellow-300/50"
+                        className="ml-2 h-2 w-2 rounded-full bg-yellow-500 shadow-md ring-1 ring-yellow-300/50"
                         title="Unsaved Changes"
                       />
                     )}
@@ -81,24 +82,16 @@ export const RequestPlayground = () => {
                   <div className="flex items-center gap-2">
                     {/* Save Button - Only show if the request is unsaved */}
                     {isUnsaved && (
-                      <Button
-                        size="sm"
-                        onClick={openSaveModal}
-                        className="ml-4"
-                      >
-                        <SaveIcon className="w-4 h-4 mr-2" />
+                      <Button size="sm" variant="ghost" onClick={openSaveModal}>
+                        <SaveIcon className="w-3.5 h-3.5 mr-1.5" />
                         Save
                       </Button>
                     )}
 
                     {/* Edit Details Button - Only show if the request is saved */}
                     {isSaved && (
-                      <Button
-                        size="sm"
-                        onClick={openEditModal}
-                        className="ml-4"
-                      >
-                        <PencilIcon className="w-4 h-4 mr-2" />
+                      <Button size="sm" variant="ghost" onClick={openEditModal}>
+                        <PencilIcon className="w-3.5 h-3.5 mr-1.5" />
                         Edit
                       </Button>
                     )}

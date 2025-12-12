@@ -1,11 +1,11 @@
 "use client";
-import React from "react";
-import { HotkeysProvider } from "react-hotkeys-hook";
 import {
   isServer,
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import React from "react";
+import { HotkeysProvider } from "react-hotkeys-hook";
 
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";

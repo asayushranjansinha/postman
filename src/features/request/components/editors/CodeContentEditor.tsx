@@ -60,7 +60,6 @@ const contentTypeOptions = [
   },
 ];
 
-
 // Sub-Components
 interface ContentTypeSelectorProps {
   form: UseFormReturn<ContentEditorFormData>;
@@ -88,8 +87,7 @@ const ContentTypeSelector: React.FC<ContentTypeSelectorProps> = ({
             <FormControl>
               <SelectTrigger
                 className={cn(
-                  "h-8 text-xs w-fit bg-transparent border-none shadow-none ring-0",
-                  "hover:bg-accent/50 focus:ring-0 focus:border-0 data-[state=open]:bg-accent/50"
+                  "h-8 text-xs w-fit bg-transparent border-none shadow-none ring-0"
                 )}
               >
                 <SelectValue />
@@ -204,7 +202,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   disabled,
 }) => {
   return (
-    <div className="flex items-center justify-between px-4 py-1.5 bg-muted/30 border-b">
+    <div className="flex items-center justify-between px-4 py-1.5 bg-card border-b z-10 relative">
       <ContentTypeSelector form={form} disabled={disabled} />
       <EditorActions
         contentType={contentType}
@@ -236,7 +234,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   disabled,
 }) => {
   return (
-    <div className="relative bg-background/50">
+    <div className="relative bg-background">
       <FormField
         control={form.control}
         name="body"
@@ -345,7 +343,7 @@ const EditorFooter: React.FC<EditorFooterProps> = ({ bodyValue, disabled }) => {
   );
 
   return (
-    <div className="flex items-center justify-between px-4 py-1.5 bg-muted/30 border-t">
+    <div className="flex items-center justify-between px-4 py-1.5 bg-card border-t">
       <StatsDisplay
         lines={stats.lines}
         chars={stats.chars}
@@ -354,14 +352,8 @@ const EditorFooter: React.FC<EditorFooterProps> = ({ bodyValue, disabled }) => {
       <TooltipProvider>
         <Tooltip delayDuration={300}>
           <TooltipTrigger asChild>
-            <Button
-              type="submit"
-              size="sm"
-              variant="default"
-              className="px-3 font-medium text-xs"
-              disabled={disabled}
-            >
-              <Save className="size-3 mr-1" />
+            <Button type="submit" size="sm" variant="ghost" disabled={disabled}>
+              <Save className="size-3.5 mr-1" />
               Save Changes
             </Button>
           </TooltipTrigger>
@@ -445,7 +437,7 @@ export const CodeContentEditor: React.FC<CodeContentEditorProps> = ({
   const editorTheme = resolvedTheme === "dark" ? "vs-dark" : "light";
 
   return (
-    <div className="flex flex-col rounded-lg border overflow-hidden">
+    <div className="flex flex-col rounded-lg border overflow-hidden shadow-xl">
       <TooltipProvider>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSave)}>

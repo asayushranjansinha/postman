@@ -4,6 +4,7 @@ import { HttpMethod } from "@prisma/client";
 import {
   createRequest,
   deleteRequest,
+  executePublicRequest,
   runRequest,
   saveUnsavedRequest,
   updateRequest,
@@ -12,6 +13,7 @@ import {
   upsertRequestQueryParams,
 } from "../server/action";
 import {
+  ExecutionDetails,
   PrismaRequestDetails,
   PrismaRequestRun,
   SaveUnsavedRequestInput,
@@ -236,6 +238,41 @@ export const useSaveUnsavedRequestMutation = () => {
       } else {
         console.error(
           "Save Unsaved Request failed (Server Action Error):",
+          response.message
+        );
+      }
+    },
+    onError(error) {
+      console.error("Mutation failed (Client Error):", error);
+    },
+  });
+};
+
+
+/**
+ * Hook to execute a public, non-persisted request.
+ * This skips authentication and database storage, used for initial public testing.
+ *
+ * @returns data - The temporary RequestRun object (PrismaRequestRun)
+ */
+export const useExecutePublicRequestMutation = () => {
+  // Query Client is not strictly necessary as no data is being invalidated/persisted,
+  // but keeping the structure standard.
+  // const queryClient = useQueryClient();
+
+  return useMutation({
+    // The mutationFn accepts the ExecutionDetails object directly
+    mutationFn: (details: ExecutionDetails) => executePublicRequest(details),
+
+    onSuccess(response) {
+      if (response.success && response.data) {
+        const run: PrismaRequestRun = response.data;
+        console.log(
+          `Public request executed successfully. Status: ${run.status}`
+        );
+      } else {
+        console.error(
+          "Public Request execution failed (Server Action Error):",
           response.message
         );
       }

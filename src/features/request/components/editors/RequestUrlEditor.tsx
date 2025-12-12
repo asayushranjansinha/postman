@@ -30,6 +30,12 @@ interface RequestUrlInputProps {
   onSend: () => void;
 }
 
+/**
+ * Editor for constructing API request URLs and methods.
+ * Features an HTTP method selector, URL input, and a "Send" button.
+ * Props: `tab` (details), `updateTab` (state sync), `onSend` (execute request).
+ */
+
 export const RequestUrlEditor = ({
   tab,
   updateTab,
@@ -62,9 +68,7 @@ export const RequestUrlEditor = ({
               <SelectGroup>
                 {methods.map((method) => (
                   <SelectItem key={method} value={method} className="text-xs">
-                    <span className={cn(requestColorMap[method as HttpMethod])}>
-                      {method}
-                    </span>
+                    <span>{method}</span>
                   </SelectItem>
                 ))}
               </SelectGroup>
