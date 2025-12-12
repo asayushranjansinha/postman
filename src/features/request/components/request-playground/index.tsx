@@ -22,6 +22,7 @@ import { useRequestExecution } from "@/features/request/hooks/useRequestExecutio
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { SaveRequestModal } from "@/features/request/components/modals/SaveRequestModal";
 import { UpdateRequestModal } from "@/features/request/components/modals/UpdateRequestModal";
+import { RequestPlaygroundEmptyState } from "./EmptyState";
 
 export const RequestPlayground = () => {
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
@@ -137,36 +138,7 @@ export const RequestPlayground = () => {
           )}
         </>
       ) : (
-        <div className="flex-1 flex items-center justify-center text-center p-8">
-          <div className="flex flex-col items-center max-w-sm p-8 rounded-lg border border-dashed bg-muted/20">
-            <ZapIcon className="w-8 h-8 mb-4 text-primary" />
-
-            <h3 className="text-xl font-semibold mb-2 text-foreground">
-              Ready to create a Request?
-            </h3>
-
-            <p className="text-sm text-muted-foreground mb-6">
-              Get started by opening a saved request from the sidebar or
-              creating a new one.
-            </p>
-
-            {/* Primary Action Button */}
-            <Button onClick={newRequestTab} className="mb-4 w-full">
-              <PencilIcon className="w-4 h-4 mr-2" />
-              Create New Request
-            </Button>
-
-            {/* Hotkey Hint */}
-            <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
-              <span>Quick Start:</span>
-              <KbdGroup>
-                <Kbd>Ctrl/Cmd</Kbd>
-                <Kbd>Shift</Kbd>
-                <Kbd>N</Kbd>
-              </KbdGroup>
-            </div>
-          </div>
-        </div>
+        <RequestPlaygroundEmptyState onNewRequest={newRequestTab} />
       )}
     </div>
   );
