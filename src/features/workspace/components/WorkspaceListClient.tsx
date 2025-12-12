@@ -1,4 +1,3 @@
-// WorkspaceListClient.tsx (Fixed)
 "use client";
 
 import { useState } from "react";
@@ -59,8 +58,10 @@ export const WorkspaceListClient = () => {
 
   return (
     <>
-      <div className="min-h-svh bg-background">
-        <div className="relative flex flex-col container mx-auto py-12 space-y-7">
+      {/* Outer wrapper with standardized padding */}
+      <div className="min-h-svh bg-background px-4 sm:px-6 lg:px-8">
+        {/* Inner container with vertical padding and max-width */}
+        <div className="container mx-auto py-12 space-y-7">
           {/* Page header */}
           <header className="flex flex-col gap-2">
             <Pill icon={LayersIcon} label="Workspaces" />
@@ -109,12 +110,11 @@ export const WorkspaceListClient = () => {
                 onRename={openRenameModal}
               />
             ))}
-            {/* Display message if no workspaces are found after filtering */}
           </div>
         </div>
       </div>
 
-      {/* Create workspace modal */}
+      {/* Modals */}
       <CreateWorkspaceModal
         isModalOpen={showCreateModal}
         setIsModalOpen={setShowCreateModal}
