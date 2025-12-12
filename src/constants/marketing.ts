@@ -1,4 +1,5 @@
 import {
+  PricingPlan,
   ProductFeature,
   Testimonial,
   WorkflowStat,
@@ -159,5 +160,52 @@ export const CUSTOMER_TESTIMONIALS: Testimonial[] = [
     author: "Emily Nakamura",
     role: "Head of Engineering at Linear",
     avatar: "/professional-woman-tech-lead-headshot.jpg",
+  },
+];
+
+export const PRICING_PLANS: PricingPlan[] = [
+  {
+    name: "Starter",
+    price: "$0",
+    period: "/month",
+    description: "For individual developers",
+    features: ["1,000 API tests/month", "3 team members", "Basic analytics", "Community support", "7-day history"],
+    cta: "Start Free",
+    popular: false,
+  },
+  {
+    name: "Pro",
+    price: "$49",
+    period: "/month",
+    description: "For growing teams",
+    features: [
+      "Unlimited API tests",
+      "25 team members",
+      "Advanced analytics",
+      "Priority support",
+      "90-day history",
+      "CI/CD integrations",
+      "Custom environments",
+    ],
+    cta: "Start Free Trial",
+    popular: true,
+  },
+  {
+    name: "Enterprise",
+    price: "Custom",
+    period: "",
+    description: "For large organizations",
+    features: [
+      "Unlimited everything",
+      "Unlimited team members",
+      "Custom analytics",
+      "24/7 dedicated support",
+      "Unlimited history",
+      "SSO & SAML",
+      "SLA guarantee",
+      "On-premise option",
+    ],
+    cta: "Contact Sales",
+    popular: false,
   },
 ];
