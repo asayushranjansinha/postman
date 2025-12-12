@@ -1,11 +1,9 @@
-// src/components/layout/SiteFooter.tsx
-
-import { Logo } from "@/components/shared/Logo"; // Assumed path
-import {
-  NAVIGATION_LINKS,
-  SITE_CONFIG
-} from "@/config/siteConfig";
 import Link from "next/link";
+
+import { Logo } from "@/components/shared/Logo";
+import { ToolTipHint } from "@/components/shared/ToolTipHint";
+
+import { NAVIGATION_LINKS, SITE_CONFIG } from "@/config/siteConfig";
 
 export function SiteFooter() {
   const { footerLinks, socialLinks } = NAVIGATION_LINKS;
@@ -13,7 +11,7 @@ export function SiteFooter() {
 
   return (
     <footer className="py-16 px-4 sm:px-6 lg:px-8 border-t border-border bg-card">
-      <div className="max-w-7xl mx-auto">
+      <div className="container mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
           {/* Brand & Tagline */}
           <div className="col-span-2">
@@ -101,14 +99,17 @@ export function SiteFooter() {
           </p>
           <div className="flex items-center gap-4">
             {socialLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                aria-label={link.ariaLabel}
-              >
-                <link.icon className="w-5 h-5" />
-              </Link>
+              <ToolTipHint key={link.label} label={link.label}>
+                <Link
+                  href={link.href}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={link.ariaLabel}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <link.icon className="w-5 h-5" />
+                </Link>
+              </ToolTipHint>
             ))}
           </div>
         </div>

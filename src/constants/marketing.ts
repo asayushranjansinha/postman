@@ -1,8 +1,17 @@
-import { WorkflowStat, WorkflowStep } from "@/types/marketing";
 import {
+  ProductFeature,
+  Testimonial,
+  WorkflowStat,
+  WorkflowStep,
+} from "@/types/marketing";
+import {
+  BarChart3Icon,
   ClockIcon,
   Code2Icon,
+  GitBranchIcon,
+  GlobeIcon,
   RocketIcon,
+  ShieldIcon,
   TestTube2Icon,
   UsersIcon,
   ZapIcon,
@@ -81,5 +90,74 @@ export const WORKFLOW_STATS: WorkflowStat[] = [
     value: "99.9%",
     label: "Uptime",
     description: "Enterprise ready",
+  },
+];
+
+export const PRODUCT_FEATURES: ProductFeature[] = [
+  {
+    icon: ZapIcon,
+    title: "Blazing Fast Execution",
+    description:
+      "Run thousands of API tests in parallel with sub-millisecond overhead. Our Rust-powered engine delivers unprecedented performance.",
+    highlight: "10x faster",
+  },
+  {
+    icon: Code2Icon,
+    title: "Code-First Workflows",
+    description:
+      "Write tests in TypeScript, JavaScript, or Python. Full IDE support with autocomplete, type checking, and inline documentation.",
+    highlight: "Any language",
+  },
+  {
+    icon: GitBranchIcon,
+    title: "Git-Native Testing",
+    description:
+      "Version control your API tests alongside your code. Automatic CI/CD integration with GitHub, GitLab, and Bitbucket.",
+    highlight: "CI/CD ready",
+  },
+  {
+    icon: BarChart3Icon,
+    title: "Real-Time Analytics",
+    description:
+      "Monitor API performance with live dashboards. Track latency, error rates, and throughput across all your endpoints.",
+    highlight: "Live metrics",
+  },
+  {
+    icon: ShieldIcon,
+    title: "Enterprise Security",
+    description:
+      "SOC 2 Type II certified. End-to-end encryption, SSO support, and granular role-based access control.",
+    highlight: "SOC 2 certified",
+  },
+  {
+    icon: GlobeIcon,
+    title: "Global Edge Testing",
+    description:
+      "Test your APIs from 50+ locations worldwide. Identify regional performance issues before your users do.",
+    highlight: "50+ regions",
+  },
+];
+
+export const CUSTOMER_TESTIMONIALS: Testimonial[] = [
+  {
+    quote:
+      "PulseAPI cut our API testing time from 45 minutes to under 2 minutes. The speed difference is genuinely shocking.",
+    author: "Sarah Chen",
+    role: "Staff Engineer at Vercel",
+    avatar: "/professional-woman-engineer-headshot.png",
+  },
+  {
+    quote:
+      "Finally, an API tool that feels as fast as my IDE. The TypeScript integration is flawless and the real-time feedback is addictive.",
+    author: "Marcus Rivera",
+    role: "API Lead at Stripe",
+    avatar: "/professional-developer-headshot.png",
+  },
+  {
+    quote:
+      "We migrated 2,000+ Postman collections in a weekend. The import tool is incredible and our team productivity doubled.",
+    author: "Emily Nakamura",
+    role: "Head of Engineering at Linear",
+    avatar: "/professional-woman-tech-lead-headshot.jpg",
   },
 ];

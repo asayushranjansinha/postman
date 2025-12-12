@@ -17,3 +17,17 @@ export interface WorkflowStat {
   label: string;
   description: string;
 }
+
+export interface ProductFeature {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  highlight: string;
+}
+
+export interface Testimonial {
+  quote: string;
+  author: string;
+  role: string;
+  avatar: string;
+}
