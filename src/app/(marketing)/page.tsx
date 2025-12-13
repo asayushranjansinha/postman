@@ -1,4 +1,6 @@
+import { ContactSection } from "@/components/contact";
 import { CTA } from "@/components/site/Cta";
+import { FaqSection } from "@/components/site/faq";
 import { Features } from "@/components/site/Features";
 import { Hero } from "@/components/site/HeroSection";
 import { LiveDemo } from "@/components/site/live-demo";
@@ -15,9 +17,11 @@ function MarketingPage() {
       <Features />
       <WorkflowSteps />
       <Testimonials />
+      <FaqSection />
       <PricingSection />
       <CTA />
       <Performance />
+      <ContactSection />
     </div>
   );
 }

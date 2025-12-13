@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { ActivityIcon, ShieldIcon, SparklesIcon, ZapIcon } from "lucide-react";
+import { Logo } from "@/components/shared/Logo";
+import { ActivityIcon, ShieldIcon, SparklesIcon } from "lucide-react";
 import type React from "react";
 
 interface AuthLayoutProps {
@@ -34,14 +34,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 mb-12 group">
-            <div className="w-12 h-12 rounded-xl bg-linear-to-br from-primary to-accent flex items-center justify-center glow-blue group-hover:scale-105 transition-transform">
-              <ZapIcon className="w-7 h-7 text-primary-foreground" />
-            </div>
-            <span className="text-3xl font-bold text-foreground tracking-tight">
-              Pulse<span className="text-primary">API</span>
-            </span>
-          </Link>
+          <Logo size="lg" />
 
           {/* Headline */}
           <h1 className="text-4xl xl:text-5xl font-bold text-foreground leading-tight mb-6">

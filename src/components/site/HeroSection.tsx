@@ -1,10 +1,9 @@
-"use client";
+import Link from "next/link";
+import { ArrowRightIcon } from "lucide-react";
 
-import { ArrowRightIcon, PlayIcon } from "lucide-react";
-
+import { SafariMockup } from "@/components/mockups/safari-mockup";
 import { Button } from "@/components/ui/button";
 import { HERO_CONTENT } from "@/constants/marketing";
-import { SafariMockup } from "@/components/mockups/safari-mockup";
 
 export function Hero() {
   return (
@@ -52,19 +51,24 @@ export function Hero() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-3 sm:gap-4">
               <Button
                 size="lg"
+                asChild
                 className="w-full sm:w-auto gap-2 bg-primary hover:bg-primary/90 glow-blue text-sm sm:text-base px-6 sm:px-8"
               >
-                Start Building Free
-                <ArrowRightIcon className="w-4 h-4" />
+                <Link href="/sign-in">
+                  Start Building Free
+                  <ArrowRightIcon className="w-4 h-4" />
+                </Link>
               </Button>
-              <Button
+
+              {/* TODO: Add Watch Demo Button */}
+              {/* <Button
                 variant="outline"
                 size="lg"
                 className="w-full sm:w-auto bg-transparent border-border hover:bg-secondary gap-2 text-sm sm:text-base"
               >
                 <PlayIcon className="w-4 h-4" />
                 Watch Demo
-              </Button>
+              </Button> */}
             </div>
 
             {/* Trust Indicators */}

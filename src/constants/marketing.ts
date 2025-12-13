@@ -172,7 +172,13 @@ export const PRICING_PLANS: PricingPlan[] = [
     price: "$0",
     period: "/month",
     description: "For individual developers",
-    features: ["1,000 API tests/month", "3 team members", "Basic analytics", "Community support", "7-day history"],
+    features: [
+      "1,000 API tests/month",
+      "3 team members",
+      "Basic analytics",
+      "Community support",
+      "7-day history",
+    ],
     cta: "Start Free",
     popular: false,
   },
@@ -245,4 +251,31 @@ export const PERFORMANCE_COMPARISON: ComparisonData[] = [
   { name: "Postman", time: 156, color: "bg-muted" },
   { name: "Insomnia", time: 189, color: "bg-muted" },
   { name: "Thunder Client", time: 203, color: "bg-muted" },
+];
+
+export const FAQ_ITEMS = [
+  {
+    value: "item-1",
+    question: "What is the core difference between PulseAPI and Postman?",
+    answer:
+      "PulseAPI is built specifically for speed and automation at scale, integrating testing, debugging, and monitoring into a single, cohesive workflow. Unlike legacy tools, our engine is designed for parallel execution and instant feedback, minimizing context switching and providing deep integration with CI/CD pipelines from day one. We focus on 'speed of thought' interactions.",
+  },
+  {
+    value: "item-2",
+    question: "Do I need a credit card to start the free tier?",
+    answer:
+      "Absolutely not. Our 'Free Forever' tier requires no credit card. You can start building, testing, and debugging immediately. You only need to enter payment details if you decide to upgrade to a Pro or Enterprise plan.",
+  },
+  {
+    value: "item-3",
+    question: "How is the data secured on the platform?",
+    answer:
+      "Security is paramount. We use end-to-end encryption for all data transmission and storage, adhere to strict GDPR and SOC 2 compliance standards, and offer features like dedicated environments and IP whitelisting for Enterprise users. All credentials and secrets are encrypted using AES-256.",
+  },
+  {
+    value: "item-4",
+    question: "What languages and environments do you support?",
+    answer:
+      "PulseAPI is language-agnostic. We support HTTP/1.1, HTTP/2, WebSockets, and gRPC protocols. Our CLI, SDKs, and runners are available for integration into almost any environment, including Node.js, Python, Go, and Java.",
+  },
 ];

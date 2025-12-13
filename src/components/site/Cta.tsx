@@ -2,6 +2,7 @@ import { ArrowRightIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 
 export function CTA() {
   return (
@@ -36,20 +37,28 @@ export function CTA() {
             building faster APIs today.
           </p>
 
+          {/* TODO: Add Link to sales*/}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
               size="lg"
+              asChild
               className="w-full sm:w-auto gap-2 bg-primary hover:bg-primary/90 glow-blue text-base px-8"
             >
-              Start Building Free
-              <ArrowRightIcon className="w-4 h-4" />
+              <Link href="/workspaces">
+                Start Building Free
+                <ArrowRightIcon className="w-4 h-4" />
+              </Link>
             </Button>
             <Button
               size="lg"
+              asChild
               variant="outline"
               className="w-full sm:w-auto bg-transparent border-border hover:bg-secondary text-base"
             >
-              Talk to Sales
+              <Link href="/contact">
+                Talk to Sales
+                <ArrowRightIcon className="w-4 h-4" />
+              </Link>
             </Button>
           </div>
 

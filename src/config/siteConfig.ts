@@ -4,74 +4,113 @@ import { SiteConfig } from "@/types/siteConfig";
 import { GithubIcon, TwitterIcon } from "lucide-react";
 
 export const SITE_CONFIG: SiteConfig = {
-  // Core SEO Fields
-  brandName: "PrismaPulse",
+  /* ------------------------------------------------------------------ */
+  /* Core SEO Fields                                                     */
+  /* ------------------------------------------------------------------ */
+
+  brandName: "PrismaPulse API",
   description:
-    "A comprehensive API development environment and testing platform, integrated with robust workspace management and collaboration tools.",
+    "A modern, Postman-like API development and testing platform built with Next.js, Prisma, and TypeScript. Supports workspaces, collections, environments, AI-assisted requests, and enterprise-grade authentication.",
   keywords: [
-    "API Testing",
-    "API Development",
-    "Workspace Management",
+    "API Client",
+    "API Testing Tool",
+    "Postman Alternative",
+    "API Development Platform",
+    "REST Client",
     "Next.js",
     "Prisma",
-    "REST Client",
+    "TypeScript",
+    "Monaco Editor",
+    "API Workspaces",
   ],
-  url: "https://www.prismapulse.com",
+  url: "https://ayushranjansinha-prismapulseapi.vercel.app",
 
-  // Branding & Display
-  tagline: "Develop, Test, and Collaborate on APIs.",
+  /* ------------------------------------------------------------------ */
+  /* Branding & Display                                                  */
+  /* ------------------------------------------------------------------ */
+
+  tagline: "Build, Test, and Organize APIs at Scale.",
   logoPath: "/images/logo.svg",
   faviconPath: "/favicon.ico",
 
-  // Next.js Metadata Compatibility
-  metadataBase: new URL("https://www.prismapulse.com"),
+  /* ------------------------------------------------------------------ */
+  /* Next.js Metadata Compatibility                                      */
+  /* ------------------------------------------------------------------ */
+
+  metadataBase: new URL("https://ayushranjansinha-prismapulseapi.vercel.app"),
   openGraph: {
     type: "website",
     locale: "en_IN",
-    siteName: "PrismaPulse",
+    siteName: "PrismaPulse API",
     images: [
       {
-        url: "/images/og-image.jpg", // A large, high-quality image for social media sharing
+        url: "/images/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "PrismaPulse API Development Platform",
+        alt: "PrismaPulse API – Modern API Development Platform",
       },
     ],
   },
 
-  // Developer/Legal Info
+  /* ------------------------------------------------------------------ */
+  /* Developer / Legal                                                   */
+  /* ------------------------------------------------------------------ */
+
   developer: {
     name: "Ayush Ranjan Sinha",
     email: "asayushranjansinha@gmail.com",
-    website: "http://ayushranjansinha.vercel.app",
+    website: "https://ayushranjansinha.vercel.app",
   },
   copyrightYear: 2025,
   twitterHandle: "@asayushranjansinha",
-  githubRepo: "asayushranjansinha/prismapulse",
+  githubRepo: "asayushranjansinha/postman",
+
+  /* ------------------------------------------------------------------ */
+  /* Public Contact & Community                                          */
+  /* ------------------------------------------------------------------ */
+
+  supportEmail: "asayushranjansinha@gmail.com",
+
+  social: {
+    github: "https://github.com/asayushranjansinha/postman",
+    twitter: "https://twitter.com/asayushranjan",
+    discord: undefined, // add later if needed
+  },
+
+  /* ------------------------------------------------------------------ */
+  /* Organization / Office                                               */
+  /* ------------------------------------------------------------------ */
+
+  office: {
+    label: "Remote / Open Source",
+    address: ["India", "Open to global collaboration"],
+  },
 };
 
+/* ------------------------------------------------------------------ */
+/* Navigation Links                                                     */
+/* ------------------------------------------------------------------ */
+
 export const NAVIGATION_LINKS = {
-  // Footer Links Structure
   footerLinks: {
     product: [
       { label: "Features", href: "#features" },
-      { label: "Pricing", href: "#pricing" },
-      { label: "Integrations", href: "#" },
+      { label: "Architecture", href: "#architecture" },
+      { label: "AI Integration", href: "#ai" },
       { label: "Changelog", href: "#" },
       { label: "Roadmap", href: "#" },
     ],
     developers: [
       { label: "Documentation", href: "#" },
       { label: "API Reference", href: "#" },
-      { label: "SDKs", href: "#" },
       { label: "Examples", href: "#" },
+      { label: "GitHub", href: SITE_CONFIG.social.github },
       { label: "Community", href: "#" },
     ],
     company: [
-      { label: "About Us", href: "/developer" },
+      { label: "About Developer", href: "/developer" },
       { label: "Blog", href: "#" },
-      { label: "Careers", href: "#" },
-      { label: "Press", href: "#" },
+      { label: "Contact", href: "#contact" },
     ],
     legal: [
       { label: "Privacy", href: "/privacy" },
@@ -79,24 +118,17 @@ export const NAVIGATION_LINKS = {
       { label: "Security", href: "/security" },
     ],
   },
+
   socialLinks: [
     {
-      label: "Twitter",
-      href: "#",
-      icon: TwitterIcon,
-      ariaLabel: "Follow us on Twitter",
+      label: "GitHub",
+      href: SITE_CONFIG.social.github,
+      icon: GithubIcon,
     },
     {
-      label: "GitHub",
-      href: "#",
-      icon: GithubIcon,
-      ariaLabel: "View our code on GitHub",
+      label: "Twitter",
+      href: SITE_CONFIG.social.twitter,
+      icon: TwitterIcon,
     },
-    // {
-    //   label: "Discord",
-    //   href: "#",
-    //   icon: DiscordIcon,
-    //   ariaLabel: "Join our community on Discord",
-    // },
   ],
 };
