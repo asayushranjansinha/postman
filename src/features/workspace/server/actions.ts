@@ -294,7 +294,7 @@ export async function sendWorkspaceInvite(
 
     // 2. Pre-Check: (REMOVED: Pre-check for recipient user existence or membership)
     // 3. Cleanup: (REMOVED: Cleanup logic that relied on email)
-    // NOTE: If you only want ONE active public invite per workspace, 
+    // NOTE: If you only want ONE active public invite per workspace,
     // you would delete all existing public invites here:
     /*
     await prisma.workspaceInvite.deleteMany({
@@ -346,7 +346,7 @@ export async function acceptWorkspaceInvite(input: InviteAcceptInput) {
       where: { token },
       include: {
         workspace: {
-          select: { name: true },
+          select: { name: true, id: true },
         },
       },
     });
@@ -360,8 +360,6 @@ export async function acceptWorkspaceInvite(input: InviteAcceptInput) {
       await prisma.workspaceInvite.delete({ where: { token } });
       throw new Error("Invitation link has expired.");
     }
-
-    // REMOVED: Email Match Check (This check is no longer possible)
 
     // Existing Membership Check (No Change)
     const existingMembership = await prisma.workspaceMember.findUnique({
@@ -384,7 +382,6 @@ export async function acceptWorkspaceInvite(input: InviteAcceptInput) {
     }
 
     // 2. Create the new WorkspaceMember
-    // NOTE: This now allows ANY authenticated user with the token to join.
     await prisma.workspaceMember.create({
       data: {
         userId: data.user.id,
