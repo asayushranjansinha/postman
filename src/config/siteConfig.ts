@@ -1,5 +1,3 @@
-// src/config/siteConfig.ts
-
 import { SiteConfig } from "@/types/siteConfig";
 import { GithubIcon, TwitterIcon } from "lucide-react";
 
@@ -44,10 +42,10 @@ export const SITE_CONFIG: SiteConfig = {
     siteName: "PrismaPulse API",
     images: [
       {
-        url: "/images/og-image.jpg",
+        url: "/og-image.webp",
         width: 1200,
         height: 630,
-        alt: "PrismaPulse API – Modern API Development Platform",
+        alt: "PrismaPulse API - Modern API Development Platform",
       },
     ],
   },
