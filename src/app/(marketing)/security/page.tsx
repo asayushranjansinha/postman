@@ -1,27 +1,25 @@
-// src/app/security/page.tsx (assuming this is the file)
-import Link from "next/link";
 import {
-  ZapIcon,
+  AlertTriangleIcon,
   ArrowLeftIcon,
-  ShieldIcon,
-  LockIcon,
-  KeyIcon,
-  ServerIcon,
+  BadgeCheckIcon,
+  CheckCircle2Icon,
+  CloudIcon,
+  DatabaseIcon,
+  ExternalLinkIcon,
   EyeIcon,
   FileCheckIcon,
-  UsersIcon,
-  GlobeIcon,
-  AlertTriangleIcon,
-  CheckCircle2Icon,
-  ExternalLinkIcon,
-  MailIcon,
-  BadgeCheckIcon,
   FingerprintIcon,
-  ShieldCheckIcon,
-  DatabaseIcon,
-  CloudIcon,
+  GlobeIcon,
+  KeyIcon,
+  LockIcon,
+  MailIcon,
   RefreshCwIcon,
+  ServerIcon,
+  ShieldCheckIcon,
+  ShieldIcon,
+  UsersIcon
 } from "lucide-react";
+import Link from "next/link";
 
 const certifications = [
   {
