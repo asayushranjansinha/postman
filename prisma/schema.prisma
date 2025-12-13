@@ -21,6 +21,7 @@ model User {
   // Relations
   workspaces  Workspace[]       @relation("UserWorkspaces")
   memberships WorkspaceMember[]
+  invites     WorkspaceInvite[] @relation("InviterInvites")
 
   @@unique([email])
   @@map("user")
@@ -89,9 +90,11 @@ model Workspace {
   collections  Collection[]
   environments Environment[]
   members      WorkspaceMember[]
+  invites      WorkspaceInvite[] @relation("InviterInvites")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  workspaceInvites WorkspaceInvite[]
 
   @@unique([name, ownerId])
 }
@@ -111,6 +114,36 @@ model WorkspaceMember {
   updatedAt DateTime @updatedAt
 
   @@unique([workspaceId, userId])
+}
+
+model WorkspaceInvite {
+  id String @id @default(cuid())
+
+  // The unique token used in the invitation link
+  token String @unique
+
+  // The role the invited user will have in the workspace
+  role Member @default(MEMBER)
+
+  // Link to the workspace the invite is for
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  // Optional: The user who created the invite (e.g., the workspace owner/admin)
+  inviter   User?   @relation("InviterInvites", fields: [inviterId], references: [id])
+  inviterId String?
+
+  // When the invite will expire (required field)
+  expiresAt DateTime
+
+  // When the invite was created
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  workspaces Workspace[] @relation("InviterInvites")
+
+  @@index([workspaceId])
+  @@index([inviterId])
+  @@map("workspace_invite")
 }
 
 /**

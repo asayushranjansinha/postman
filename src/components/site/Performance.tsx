@@ -13,9 +13,8 @@ import {
   PERFORMANCE_COMPARISON,
   PERFORMANCE_METRICS,
 } from "@/constants/marketing";
-import { cn } from "@/lib/utils"; // Assuming cn utility
+import { cn } from "@/lib/utils";
 
-// Utility component to handle the number counting animation
 const AnimatedMetric = ({
   value,
   unit,
@@ -63,14 +62,15 @@ export function Performance() {
   const ref = useRef<HTMLElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.3 });
 
-  // Bar chart animation variant
+  // Bar chart animation variant with minimum width support
   const barVariants = {
     hidden: { width: "0%" },
-    visible: (width: number) => ({
-      width: `${width}%`,
+    visible: (custom: { width: string; minWidth: string }) => ({
+      width: custom.width,
+      minWidth: custom.minWidth,
       transition: { duration: 1, ease: "easeOut" },
     }),
-  } as any;
+  } as any; // To ignore ts errors add any
 
   return (
     <section
@@ -118,7 +118,11 @@ export function Performance() {
           <div className="space-y-4">
             {PERFORMANCE_COMPARISON.map((item, index) => {
               // Calculate width based on a max time (e.g., 250ms for visualization)
-              const barWidth = Math.min((item.time / 250) * 100, 100);
+              const proportionalWidth = Math.min((item.time / 250) * 100, 100);
+
+              // Set minimum width to ensure text is always visible
+              // Use 80px minimum on mobile, 100px on larger screens
+              const minWidth = "min(100px, 25%)";
 
               return (
                 <div key={index} className="flex items-center gap-4">
@@ -133,11 +137,14 @@ export function Performance() {
                       )}
                       initial="hidden"
                       animate={isInView ? "visible" : "hidden"}
-                      custom={barWidth}
+                      custom={{
+                        width: `${proportionalWidth}%`,
+                        minWidth: minWidth,
+                      }}
                       variants={barVariants}
                     >
                       <span
-                        className={`text-sm font-mono font-medium ${
+                        className={`text-sm font-mono font-medium whitespace-nowrap ${
                           index === 0
                             ? "text-primary-foreground"
                             : "text-foreground"

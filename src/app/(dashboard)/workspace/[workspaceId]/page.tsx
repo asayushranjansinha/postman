@@ -55,7 +55,7 @@ export default async function WorkspaceDetailsPage({ params }: PageProps) {
               className="flex"
             >
               <div className="h-full w-full overflow-hidden">
-                <WorkspaceSidebar />
+                <WorkspaceSidebar workspaceId={workspaceId} />
               </div>
             </ResizablePanel>
           </ResizablePanelGroup>
@@ -64,7 +64,7 @@ export default async function WorkspaceDetailsPage({ params }: PageProps) {
         {/* Mobile Layout - Sheet + Playground */}
         <div className="md:hidden h-full flex flex-col">
           <RequestPlayground />
-          <MobileWorkspaceSheet />
+          <MobileWorkspaceSheet workspaceId={workspaceId} />
         </div>
       </HydrationBoundary>
     </div>
