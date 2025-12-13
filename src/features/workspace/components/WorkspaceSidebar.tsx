@@ -1,4 +1,4 @@
-// src/components/WorkspaceSidebar.tsx (or wherever it lives)
+// src/components/WorkspaceSidebar.tsx (Revised)
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -8,15 +8,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { CollectionTab } from "@/features/collection/components/collection-tab";
-// Import the new ProfileTab
-import { ProfileTab } from "@/features/collection/components/profile-tab"; 
+import { ProfileTab } from "@/features/collection/components/profile-tab";
 import {
   ArchiveIcon,
   ClockIcon,
   Share2Icon,
-  UserIcon, // Changed from CodeIcon to UserIcon
+  UserIcon,
   LucideIcon,
 } from "lucide-react";
+import { InviteMemberComponent } from "./invites/InviteMemberComponent";
 
 // Define the structure for a sidebar tab item
 interface SidebarTabItem {
@@ -28,18 +28,20 @@ interface SidebarTabItem {
 
 const sidebarTabItems: SidebarTabItem[] = [
   { icon: ArchiveIcon, label: "Collections", component: <CollectionTab /> },
-  { icon: ClockIcon, label: "History", badgeContent: 5 }, // Placeholder value
+  { icon: ClockIcon, label: "History", badgeContent: 5 },
   { icon: Share2Icon, label: "Share" },
-  // New Profile Tab replacing the old "CodeIcon" entry
-  { icon: UserIcon, label: "Profile", component: <ProfileTab /> }, 
+  { icon: UserIcon, label: "Profile", component: <ProfileTab /> },
 ];
 
-export function WorkspaceSidebar() {
-  // Set the default value to the first item's label, formatted as an ID
+// Assume this component receives the ID of the currently active workspace
+interface WorkspaceSidebarProps {
+  workspaceId: string; // Add this prop
+}
+
+export function WorkspaceSidebar({ workspaceId }: WorkspaceSidebarProps) {
   const defaultValue =
     sidebarTabItems[0]?.label.toLowerCase().replace(/\s/g, "-") ||
     "collections";
-
   return (
     <Tabs
       defaultValue={defaultValue}
@@ -49,13 +51,12 @@ export function WorkspaceSidebar() {
       <TabsList className="flex-col h-full rounded-none justify-start border-r py-4 gap-0.5 shrink-0">
         {sidebarTabItems.map((item) => {
           const tabValue = item.label.toLowerCase().replace(/\s/g, "-");
-          const IconComponent = item.icon; // The icon component
+          const IconComponent = item.icon;
 
           return (
             <TooltipProvider delayDuration={0} key={tabValue}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  {/* The span wrapper is necessary because TooltipTrigger with asChild cannot directly wrap a disabled element */}
                   <span>
                     <TabsTrigger value={tabValue} className="group py-3">
                       <span className="relative">
@@ -64,7 +65,6 @@ export function WorkspaceSidebar() {
                           strokeWidth={2}
                           aria-hidden="true"
                         />
-                        {/* Conditionally render the Badge if badgeContent is provided */}
                         {item.badgeContent !== undefined && (
                           <Badge className="absolute -top-2.5 left-full size-4 -translate-x-1.5 border-background px-0.5 text-[10px]/[.875rem] transition-opacity group-data-[state=inactive]:opacity-50 aspect-square!">
                             {item.badgeContent}
@@ -81,29 +81,35 @@ export function WorkspaceSidebar() {
         })}
       </TabsList>
 
-      {/* Content Area */}
-      <div className="grow text-start p-0 min-w-0 overflow-hidden">
-        {sidebarTabItems.map((item) => {
-          const tabValue = item.label.toLowerCase().replace(/\s/g, "-");
-          const TabContentComponent = item.component; // Renamed variable to avoid confusion
+      {/* Content Area: Now a flex column */}
+      <div className="flex flex-col grow text-start p-0 min-w-0 overflow-hidden h-full">
+        {/* INVITE MEMBER COMPONENT (FIXED HEADER) */}
+        <InviteMemberComponent workspaceId={workspaceId} />
 
-          return (
-            <TabsContent
-              value={tabValue}
-              key={tabValue}
-              className="p-0 h-full min-w-0 overflow-hidden"
-            >
-              {TabContentComponent ? (
-                // Directly render the JSX element stored in item.component
-                TabContentComponent
-              ) : (
-                <p className="px-4 py-1.5 text-xs text-muted-foreground">
-                  Content for **{item.label}** Coming Soon
-                </p>
-              )}
-            </TabsContent>
-          );
-        })}
+        {/* Tab Content (SCROLLABLE BODY) */}
+        <div className="flex-1 overflow-y-auto">
+          {sidebarTabItems.map((item) => {
+            const tabValue = item.label.toLowerCase().replace(/\s/g, "-");
+            const TabContentComponent = item.component;
+
+            return (
+              <TabsContent
+                value={tabValue}
+                key={tabValue}
+                // Removed h-full and overflow-hidden here to allow parent div to control scroll
+                className="p-0 min-w-0"
+              >
+                {TabContentComponent ? (
+                  TabContentComponent
+                ) : (
+                  <p className="px-4 py-1.5 text-xs text-muted-foreground">
+                    Content for **{item.label}** Coming Soon
+                  </p>
+                )}
+              </TabsContent>
+            );
+          })}
+        </div>
       </div>
     </Tabs>
   );

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { WorkspaceSidebar } from "@/features/workspace/components/WorkspaceSidebar";
 
-export function MobileWorkspaceSheet() {
+export function MobileWorkspaceSheet({ workspaceId }: { workspaceId: string }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -32,7 +32,7 @@ export function MobileWorkspaceSheet() {
           <SheetTitle>Workspace</SheetTitle>
         </SheetHeader>
         <div className="h-[calc(100%-4rem)] overflow-hidden">
-          <WorkspaceSidebar />
+          <WorkspaceSidebar workspaceId={workspaceId} />
         </div>
       </SheetContent>
     </Sheet>
