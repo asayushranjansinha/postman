@@ -8,27 +8,28 @@ import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import {
-    InputGroup,
-    InputGroupButton,
-    InputGroupInput,
+  InputGroup,
+  InputGroupButton,
+  InputGroupInput,
 } from "@/components/ui/input-group";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 
 import { AllowedInviteRoles } from "@/features/workspace/types";
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 
 // Define the constant array for Zod's runtime validation
 const INVITE_ROLES_ARRAY = ["MEMBER", "ADMIN"] as const;
@@ -38,7 +39,6 @@ const inviteFormSchema = z.object({
 });
 
 type InviteFormValues = z.infer<typeof inviteFormSchema>;
-// -----------------------------
 
 interface WorkspaceInviteFormProps {
   workspaceId: string; // Not used in form fields, but passed to onSubmit
@@ -53,7 +53,7 @@ export const WorkspaceInviteForm = ({
   onCancel,
 }: WorkspaceInviteFormProps) => {
   const [inviteToken, setInviteToken] = useState<string | null>(null);
-  const [isCopied, setIsCopied] = useState(false);
+  const { copied, copyFn } = useCopyToClipboard();
 
   const form = useForm<InviteFormValues>({
     resolver: zodResolver(inviteFormSchema),
@@ -70,12 +70,6 @@ export const WorkspaceInviteForm = ({
     }
   };
 
-  const copyToClipboard = async (value: string) => {
-    await navigator.clipboard.writeText(value);
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 1500);
-  };
-
   if (inviteToken) {
     const inviteLink = `${window.location.origin}/invite/${inviteToken}`;
 
@@ -87,9 +81,9 @@ export const WorkspaceInviteForm = ({
             aria-label="Copy"
             title="Copy"
             size="icon-xs"
-            onClick={() => copyToClipboard(inviteLink)}
+            onClick={() => copyFn(inviteLink)}
           >
-            {isCopied ? (
+            {copied ? (
               <Check className="h-4 w-4" />
             ) : (
               <Copy className="h-4 w-4" />
